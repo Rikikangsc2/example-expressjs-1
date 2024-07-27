@@ -541,6 +541,7 @@ app.get('/gemini', async (req, res) => {
       const red = encodeURIComponent(JSON.stringify(json));
   res.redirect(succes+red);
   } catch (error) {
+      console.error(error);
     res.redirect(failed)
   }
 });
