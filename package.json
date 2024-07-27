@@ -1,22 +1,15 @@
 {
-  "name": "example-expressjs",
+  "name": "example-expressjs-1",
   "version": "1.0.0",
-  "description": "",
+  "description": "[![example-expressjs](https://github.com/koyeb/example-expressjs/actions/workflows/deploy.yaml/badge.svg)](https://github.com/koyeb/example-expressjs/actions)",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app.js"
   },
+  "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@bochilteam/scraper": "^5.0.1",
-    "@distube/ytdl-core": "^4.13.5",
-    "axios": "^1.7.2",
-    "body-parser": "^1.20.2",
-    "express": "^4.18.2",
-    "form-data": "^4.0.0",
-    "g-i-s": "^2.1.7",
-    "rsnchat": "^4.0.1"
+    "express": "^4.19.2"
   }
 }
