@@ -4,7 +4,6 @@ const path = require('path');
 const fs = require('fs');
 const scrap = require('@bochilteam/scraper');
 const axios = require('axios');
-const { gpt } = require('gpti');
 const app = express();
 const failed = "https://nue-api.vercel.app/error"
 const FormData = require('form-data');
@@ -553,21 +552,8 @@ app.get('/gpt', async (req, res) => {
     }
 
     try {
-        const data = await new Promise((resolve, reject) => {
-            gpt({
-                messages: [],
-                prompt: prompt,
-                model: 'gpt-4',
-                markdown: false
-            }, (err, data) => {
-                if (err != null) {
-                    reject(err);
-                } else {
-                    resolve(data);
-                }
-            });
-        });
-        const json = {endpoint:base+'/api/gpt?prompt='+encodeURIComponent(prompt),status:200, result:data.gpt}
+        const response = await rsnchat.gpt(prompt)
+        const json = {endpoint:base+'/api/gpt?prompt='+encodeURIComponent(prompt),status:200, result:response.message}
         const red = encodeURIComponent(JSON.stringify(json));
         res.redirect(succes+red);
     } catch (err) {
@@ -1062,6 +1048,7 @@ const sdxlList = async (res) => {
 };
 
 
+
 app.listen(8000, () => {
-    console.log('Server berjalan di port 3000');
+console.log("Berjalan di port 8000")
 });
