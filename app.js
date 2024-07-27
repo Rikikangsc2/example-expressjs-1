@@ -9,7 +9,8 @@ const config = {
 }
 
 app.get('/ocr', async (req, res) =>{
-  if (req.query.url) return res.status(400).json({ error: "url is required" })
+  if (!req.query.url) return res.status(400).json({ error: "url is required" });
+  
   const img = req.query.url
 
 tesseract
