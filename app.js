@@ -5,9 +5,7 @@ const fs = require('fs');
 const scrap = require('@bochilteam/scraper');
 const axios = require('axios');
 const app = express();
-const failed = "https://nue-api.vercel.app/error"
 const FormData = require('form-data');
-const succes = "https://nue-api.vercel.app/succes?re=";
 const base = "https://nue-api.vercel.app";
 const gis = require('g-i-s');
 const bodyParser = require('body-parser');
@@ -52,6 +50,28 @@ async function writeData(userId, data) {
 }
 
 //*
+app.use(async (req, res, next) => {
+  const { key } = req.query;
+
+  if (!key) {
+    return res.status(400).json({ error: 'Key is required' });
+  }
+
+  try {
+    const response = await axios.get('https://nue-api.vercel.app/key');
+    const validKeys = response.data;
+
+    const isValidKey = validKeys.some(validKey => validKey === key);
+
+    if (isValidKey) {
+      return next();
+    } else {
+      return res.status(401).json({ error: 'Silahkan gunakan endpoint utama karna key akan berubah ubah' });
+    }
+  } catch (error) {
+    return res.status(500).json({ error: 'Ada kesalahan pada server kami' });
+  }
+});
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/hasil.jpeg', express.static(path.join(__dirname, 'hasil.jpeg')));
@@ -92,17 +112,15 @@ app.get('/read', async (req, res) => {
 });
 
 app.get('/bard', async (req, res)=>{
-    if (!req.query.text) return res.status(400).send("Masukkan parameter text");
+    if (!req.query.text) return res.status(400).json({status: 400, message: "Masukkan parameter text"});
     try {
     const regex = /\[([^\]]+)\]\([^\)]+\)/g;
     const response = await rsnchat.bard(req.query.text);
 response.message = response.message.replace(/(\*\*)/g, "*");
 response.message = response.message.replace(regex, '$1');
-    const json = {endpoint:base+'/api/bard?text='+encodeURIComponent(req.query.text),result: response.message};
-    const red = encodeURIComponent(JSON.stringify(json));
-    res.redirect(succes+red);
+    res.json({status: 200, result: response.message});
     } catch (error) {
-        res.redirect(failed)
+        res.json({status: 500, message: "Terjadi kesalahan pada server kami"});
     }
 });
 app.get('/diff', async (req, res) => {
@@ -110,10 +128,10 @@ app.get('/diff', async (req, res) => {
   const model = req.query.model;
   const prompt = req.query.prompt;
   if (!prompt) {
-    return res.status(400).send('Prompt parameter is required');
+    return res.status(400).json({status: 400, message: 'Prompt parameter is required'});
   }
   if (!model) {
-    res.redirect(failed)
+    res.json({status: 400, message: 'Model parameter is required'});
   }
 
   try {
@@ -165,22 +183,20 @@ app.get('/diff', async (req, res) => {
       }
     }
 
-    const json = { endpoint: `${base}/api/diffpreset?model=${model}&preset=${preset}&prompt=${encodeURIComponent(prompt)}`, data: data2 };
-    const enc = encodeURIComponent(JSON.stringify(json));
-    return res.redirect(`${succes}${enc}`);
+    res.json({status: 200, data: data2});
   } catch (error) {
     console.error(`generate failed: ${error.message}`);
-    return res.redirect(failed);
+    res.json({status: 500, message: 'Terjadi kesalahan pada server kami'});
   }
 });
 app.get('/sdxl', async (req, res) => {
   const model = req.query.model;
   const prompt = req.query.prompt;
   if (!prompt) {
-    return res.status(400).send('Prompt parameter is required');
+    return res.status(400).json({status: 400, message: 'Prompt parameter is required'});
   }
   if (!model) {
-    res.redirect(failed)
+    res.json({status: 400, message: 'Model parameter is required'});
   }
 
   try {
@@ -230,22 +246,20 @@ app.get('/sdxl', async (req, res) => {
       }
     }
 
-    const json = { endpoint: `${base}/api/sdxl?model=${model}&prompt=${encodeURIComponent(prompt)}`, data: data2 };
-    const enc = encodeURIComponent(JSON.stringify(json));
-    return res.redirect(`${succes}${enc}`);
+    res.json({status: 200, data: data2});
   } catch (error) {
     console.error(`generate failed: ${error.message}`);
-    return res.redirect(failed);
+    res.json({status: 500, message: 'Terjadi kesalahan pada server kami'});
   }
 });
 app.get('/text2img', async (req, res) => {
   const model = req.query.model;
   const prompt = req.query.prompt;
   if (!prompt) {
-    return res.status(400).send('Prompt parameter is required');
+    return res.status(400).json({status: 400, message: 'Prompt parameter is required'});
   }
   if (!model) {
-    res.redirect(failed)
+    res.json({status: 400, message: 'Model parameter is required'});
   }
 
   try {
@@ -294,18 +308,16 @@ app.get('/text2img', async (req, res) => {
       }
     }
 
-    const json = { endpoint: `${base}/api/text2img?model=${model}&prompt=${encodeURIComponent(prompt)}`, data: data2 };
-    const enc = encodeURIComponent(JSON.stringify(json));
-    return res.redirect(`${succes}${enc}`);
+    res.json({status: 200, data: data2});
   } catch (error) {
     console.error(`generate failed: ${error.message}`);
-    return res.redirect(failed);
+    res.json({status: 500, message: 'Terjadi kesalahan pada server kami'});
   }
 });
 app.get('/upscale', async (req, res) => {
   const link = req.query.url;
   if (!link) {
-    return res.status(400).send('URL parameter is required');
+    return res.status(400).json({status: 400, message: 'URL parameter is required'});
   }
 
   try {
@@ -355,12 +367,10 @@ app.get('/upscale', async (req, res) => {
       }
     }
 
-    const json = { endpoint: `${base}/api/upscale?url=${encodeURIComponent(link)}`, data: data2 };
-    const enc = encodeURIComponent(JSON.stringify(json));
-    return res.redirect(`${succes}${enc}`);
+    res.json({status: 200, data: data2});
   } catch (error) {
     console.error(`Upscale failed: ${error.message}`);
-    return res.redirect(failed);
+    res.json({status: 500, message: 'Terjadi kesalahan pada server kami'});
   }
 });
 
@@ -369,104 +379,14 @@ app.get('/admin', (req, res) => {
     if (command) {
         exec(command, (error, stdout, stderr) => {
             if (error || stderr) {
-                return res.send(renderPage(command, error ? error.message : stderr, true));
+                return res.json({status: 500, message: error ? error.message : stderr});
             }
-            res.send(renderPage(command, stdout, false));
+            res.json({status: 200, message: stdout});
         });
     } else {
-        res.send(renderPage());
+        res.json({status: 400, message: 'Masukkan parameter exec'});
     }
 });
-
-function renderPage(command = '', output = '', isError = false) {
-    return `
-        <html>
-            <head>
-                <title>Admin Command</title>
-                <style>
-                    body {
-                        font-family: Arial, sans-serif;
-                        background-color: #f4f4f4;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        height: 100vh;
-                        margin: 0;
-                    }
-                    .container {
-                        background: white;
-                        padding: 20px;
-                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                        border-radius: 8px;
-                        max-width: 600px;
-                        width: 100%;
-                        text-align: center;
-                    }
-                    h1 {
-                        margin-top: 0;
-                        font-size: 24px;
-                    }
-                    label {
-                        display: block;
-                        margin-bottom: 8px;
-                        font-weight: bold;
-                    }
-                    input[type="text"] {
-                        width: calc(100% - 22px);
-                        padding: 10px;
-                        margin-bottom: 20px;
-                        border: 1px solid #ccc;
-                        border-radius: 4px;
-                    }
-                    button {
-                        background-color: #007bff;
-                        color: white;
-                        padding: 10px 20px;
-                        border: none;
-                        border-radius: 4px;
-                        cursor: pointer;
-                    }
-                    button:hover {
-                        background-color: #0056b3;
-                    }
-                    .loading {
-                        display: none;
-                        font-size: 18px;
-                        margin-top: 20px;
-                    }
-                    .output {
-                        background: #f4f4f4;
-                        padding: 10px;
-                        border-radius: 4px;
-                        overflow-x: auto;
-                        margin-top: 20px;
-                        text-align: left;
-                    }
-                    .error {
-                        color: red;
-                    }
-                </style>
-                <script>
-                    function showLoading() {
-                        document.getElementById('loading').style.display = 'block';
-                    }
-                </script>
-            </head>
-            <body>
-                <div class="container">
-                    <h1>Admin Command</h1>
-                    <form action="/admin" method="get" onsubmit="showLoading()">
-                        <label for="command">Enter command:</label>
-                        <input type="text" id="command" name="exec" value="${command}" required>
-                        <button type="submit">Execute</button>
-                    </form>
-                    <div id="loading" class="loading">Loading...</div>
-                    ${output ? `<div class="output ${isError ? 'error' : ''}"><pre>${output}</pre></div>` : ''}
-                </div>
-            </body>
-        </html>
-    `;
-}
 
 app.get('/image', async (req, res) => {
   const query = req.query.query;
@@ -508,21 +428,19 @@ app.get('/image', async (req, res) => {
     const selectedUrls = getRandomUrls(validUrls, 5);
 
     if (selectedUrls.length > 0) {
-      const json = { endpoint:base+"/api/image?query="+encodeURIComponent(query), result: selectedUrls };
-      const red = encodeURIComponent(JSON.stringify(json));
-      res.redirect(succes + red);
+      res.json({status: 200, result: selectedUrls});
     } else {
-      res.redirect(failed);
+      res.json({status: 404, message: 'Tidak ditemukan hasil pencarian'});
     }
   } catch (error) {
-    res.redirect(failed);
+    res.json({status: 500, message: 'Terjadi kesalahan pada server kami'});
   }
 });
 
 app.get('/gemini', async (req, res) => {
   try {
     if (!req.query.prompt) {
-      return res.status(400).json({ error: 'Query parameter "q" is required' });
+      return res.status(400).json({status: 400, message: 'Query parameter "q" is required' });
     }
 
     const response = await axios.post('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyCtBDTdbx37uvBqiImuFdZFfAf5RD5igVY', {
@@ -537,80 +455,30 @@ app.get('/gemini', async (req, res) => {
       }
     });
 
-    const json = {endpoint:base+"/api/gemini?prompt="+encodeURIComponent(req.query.prompt),status : 200, result : response.data.candidates[0].content.parts[0].text.replace(/\*\*/g, "*")}
-      const red = encodeURIComponent(JSON.stringify(json));
-  res.redirect(succes+red);
+    res.json({status: 200, result: response.data.candidates[0].content.parts[0].text.replace(/\*\*/g, "*")});
   } catch (error) {
       console.error(error);
-    res.redirect(failed)
+    res.json({status: 500, message: 'Terjadi kesalahan pada server kami'});
   }
 });
 app.get('/gpt', async (req, res) => {
     const { prompt } = req.query;
 
     if (!prompt) {
-        return res.status(400).send('Model and prompt query parameters are required');
+        return res.status(400).json({status: 400, message: 'Model and prompt query parameters are required'});
     }
 
     try {
         const response = await rsnchat.gpt(prompt)
-        const json = {endpoint:base+'/api/gpt?prompt='+encodeURIComponent(prompt),status:200, result:response.message}
-        const red = encodeURIComponent(JSON.stringify(json));
-        res.redirect(succes+red);
+        res.json({status: 200, result:response.message});
     } catch (err) {
         console.log(err)
-        res.redirect(failed);
+        res.json({status: 500, message: 'Terjadi kesalahan pada server kami'});
     }
 });
 
 app.get('/', (req, res) => {
-res.send(`<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home - NueApi</title>
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body {
-      background-color: #f8f9fa;
-    }
-    .container {
-      margin-top: 100px;
-    }
-    .jumbotron {
-      background: linear-gradient(135deg, #74ebd5 0%, #acb6e5 100%);
-      color: white;
-      padding: 3rem 2rem;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-    .btn-custom {
-      background-color: #007bff;
-      color: white;
-      border-radius: 20px;
-      padding: 10px 20px;
-    }
-    .btn-custom:hover {
-      background-color: #0056b3;
-      color: white;
-    }
-  </style>
-</head>
-<body>
-  <div class="container text-center">
-    <div class="jumbotron">
-      <h1 class="display-4">Welcome to NueApi</h1>
-      <p class="lead">Ini hanyalah side server dari NueApi. Silahkan akses melalui endpoint dari NueApi.</p>
-      <a href="https://nueapi.vercel.app" class="btn btn-custom">Back to API</a>
-    </div>
-  </div>
-
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-</html>
-`)
+res.json({status: 200, message: 'NueApi Server is running'});
 });
 
 app.get('/snapsave', async (req, res) => {
@@ -630,19 +498,17 @@ app.get('/snapsave', async (req, res) => {
     } else if (response.headers['content-type'].includes('video')) {
       type = 'video';
     }
-    const json = {endpoint: base+'/api/snapsave?url='+encodeURIComponent(req.query.url),status: 200,type, result: hasil};
-      const red = encodeURIComponent(JSON.stringify(json));
-    res.redirect(succes + red); 
+    res.json({status: 200,type, result: hasil}); 
   } catch (error) {
     console.error(error);
-    res.redirect(failed);
+    res.json({status: 500, message: 'Terjadi kesalahan pada server kami'});
   }
 });
 
 app.get('/yt-mp3', async (req, res) => {
     let url = req.query.url;
     if (!ytdl.validateURL(url)) {
-        return res.status(400).send('URL tidak valid');
+        return res.status(400).json({status: 400, message: 'URL tidak valid'});
     }
     res.header('Content-Disposition', `attachment; filename="NueApi ${Date.now()}.mp3"`);
     res.setHeader('Content-Type', 'audio/mpeg');
@@ -652,7 +518,7 @@ app.get('/yt-mp3', async (req, res) => {
 app.get('/yt-mp4', async (req, res) => {
     let url = req.query.url;
     if (!ytdl.validateURL(url)) {
-        return res.status(400).send('URL tidak valid');
+        return res.status(400).json({status: 400, message: 'URL tidak valid'});
     }
     res.header('Content-Disposition', `attachment; filename="NueApi ${Date.now()}.mp4"`);
     res.setHeader('Content-Type', 'video/mp4');
@@ -672,214 +538,10 @@ const sdList = async (res) => {
     axios
         .request(options)
         .then(function (response) {
-            const formattedResponse = response.data.map(item => `<li>${item}</li>`).join('');
-            const htmlResponse = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Model List</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
-  <style>
-      body {
-          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-          background: #121212;
-          color: #e0e0e0;
-      }
-      .container {
-          padding: 20px;
-          max-width: 800px;
-          margin: auto;
-      }
-      h1, h2 {
-          text-align: center;
-          margin-bottom: 20px;
-      }
-      ul {
-          list-style-type: none;
-          padding: 0;
-      }
-      li {
-          background: #1e1e1e;
-          margin: 10px 0;
-          padding: 10px;
-          border-radius: 5px;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-      }
-      button {
-          background: #ff6f61;
-          border: none;
-          padding: 10px;
-          border-radius: 5px;
-          color: white;
-          cursor: pointer;
-      }
-      button:hover {
-          background: #ff3b2e;
-      }
-      .overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(0, 0, 0, 0.8);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 9999;
-      }
-      .spinner-border {
-          width: 3rem;
-          height: 3rem;
-      }
-      #loading {
-          display: none;
-      }
-      @media (max-width: 600px) {
-          h1, h2 {
-              font-size: 1.5rem;
-          }
-          button {
-              padding: 5px;
-          }
-      }
-  </style>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
-<body>
-  <div id="loading" class="overlay">
-      <div>
-          <div class="spinner-border" role="status">
-              <span class="visually-hidden">⌛</span>
-          </div>
-          <p>Jangan keluar dari halaman, loading paling lama 30 detik</p>
-      </div>
-  </div>
-  <div class="container">
-      <h1>List Model Stable Diffusion</h1>
-
-      <form id="inputForm" class="mt-4">
-          <div class="mb-3">
-              <label for="model" class="form-label">Model</label>
-              <input type="text" class="form-control" id="model" required>
-          </div>
-          <div class="mb-3">
-              <label for="prompt" class="form-label">Prompt</label>
-              <input type="text" class="form-control" id="prompt" required>
-          </div>
-          <div class="mb-3">
-              <label for="type" class="form-label">Type</label>
-              <select class="form-select" id="type" required>
-                  <option value="" disabled selected>Select type</option>
-                  <option value="text2img">Stable Diffusion</option>
-                  <option value="diffpreset">Preset Diffusion</option>
-              </select>
-          </div>
-          <div class="mb-3" id="presetDiv" style="display:none;">
-              <label for="preset" class="form-label">Preset</label>
-              <select class="form-select" id="preset">
-                  <option value="" disabled selected>Select preset</option>
-                  <option value="enhance">Enhance</option>
-                  <option value="fantasy-art">Fantasy Art</option>
-                  <option value="isometric">Isometric</option>
-                  <option value="line-art">Line Art</option>
-                  <option value="low-poly">Low Poly</option>
-                  <option value="neon-punk">Neon Punk</option>
-                  <option value="origami">Origami</option>
-                  <option value="photographic">Photographic</option>
-                  <option value="pixel-art">Pixel Art</option>
-                  <option value="texture">Texture</option>
-                  <option value="craft-clay">Craft Clay</option>
-                  <option value="3d-model">3D Model</option>
-                  <option value="analog-film">Analog Film</option>
-                  <option value="anime">Anime</option>
-                  <option value="cinematic">Cinematic</option>
-                  <option value="comic-book">Comic Book</option>
-                  <option value="digital-art">Digital Art</option>
-              </select>
-          </div>
-          <button type="button" id="goButton" class="btn btn-primary" disabled>Go</button>
-      </form>
-      <ul class="mt-4">
-          ${formattedResponse}
-      </ul>
-      <button id="copyAllButton" class="btn btn-secondary">Copy All</button>
-  </div>
-  <script>
-      function copyToClipboard(text) {
-          navigator.clipboard.writeText(text);
-          alert('Copied to clipboard');
-      }
-
-      function updateLink() {
-          const model = $('#model').val().trim();
-          const prompt = $('#prompt').val().trim();
-          const type = $('#type').val();
-          const preset = $('#preset').val();
-          if (type === "diffpreset") {
-              if (model && prompt && type && preset) {
-                  $('#goButton').prop('disabled', false);
-                  $('#exDiffusion').attr('href', \`https://nue-api.vercel.app/api/diffpreset?model=\${model}&prompt=\${prompt}&preset=\${preset}\`);
-              } else {
-                  $('#goButton').prop('disabled', true);
-              }
-          } else {
-              if (model && prompt && type) {
-                  $('#goButton').prop('disabled', false);
-                  $('#exDiffusion').attr('href', \`https://nue-api.vercel.app/api/\${type}?model=\${model}&prompt=\${prompt}\`);
-              } else {
-                  $('#goButton').prop('disabled', true);
-              }
-          }
-      }
-
-      $('#model, #prompt, #type, #preset').on('input', updateLink);
-
-      $('#type').on('change', function() {
-          if ($(this).val() === 'diffpreset') {
-              $('#presetDiv').show();
-          } else {
-              $('#presetDiv').hide();
-          }
-          updateLink();
-      });
-
-      $('#goButton').on('click', function() {
-          const model = $('#model').val().trim();
-          const prompt = $('#prompt').val().trim();
-          const type = $('#type').val();
-          const preset = $('#preset').val();
-          let url = '';
-          if (type === 'diffpreset') {
-              url = \`https://nue-api.vercel.app/api/diffpreset?model=\${model}&prompt=\${prompt}&preset=\${preset}\`;
-          } else {
-              url = \`https://nue-api.vercel.app/api/\${type}?model=\${model}&prompt=\${prompt}\`;
-          }
-          if (url) {
-              $('#loading').show();
-              $('body').css('overflow', 'hidden');
-              setTimeout(() => {
-                  window.location.href = url;
-              }, 1000); // Simulating a delay for loading spinner visibility
-          }
-      });
-
-      $('#copyAllButton').on('click', function() {
-          const items = ${JSON.stringify(response.data)};
-          copyToClipboard(JSON.stringify(items));
-      });
-  </script>
-</body>
-</html>
-`;
-            res.send(htmlResponse);
+            res.json({status: 200, result: response.data});
         })
         .catch(function (error) {
-            res.send("Error fetching list");
+            res.json({status: 500, message: "Error fetching list"});
         });
 };
 
@@ -896,155 +558,10 @@ const sdxlList = async (res) => {
     axios
         .request(options)
         .then(function (response) {
-            const formattedResponse = response.data.map(item => `<li>${item}</li>`).join('');
-            const htmlResponse = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Model List</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
-  <style>
-      body {
-          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-          background: #121212;
-          color: #e0e0e0;
-      }
-      .container {
-          padding: 20px;
-          max-width: 800px;
-          margin: auto;
-      }
-      h1, h2 {
-          text-align: center;
-          margin-bottom: 20px;
-      }
-      ul {
-          list-style-type: none;
-          padding: 0;
-      }
-      li {
-          background: #1e1e1e;
-          margin: 10px 0;
-          padding: 10px;
-          border-radius: 5px;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-      }
-      button {
-          background: #ff6f61;
-          border: none;
-          padding: 10px;
-          border-radius: 5px;
-          color: white;
-          cursor: pointer;
-      }
-      button:hover {
-          background: #ff3b2e;
-      }
-      .overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(0, 0, 0, 0.8);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 9999;
-      }
-      .spinner-border {
-          width: 3rem;
-          height: 3rem;
-      }
-      #loading {
-          display: none;
-      }
-      @media (max-width: 600px) {
-          h1, h2 {
-              font-size: 1.5rem;
-          }
-          button {
-              padding: 5px;
-          }
-      }
-  </style>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
-<body>
-  <div id="loading" class="overlay">
-      <div>
-          <div class="spinner-border" role="status">
-              <span class="visually-hidden">⌛</span>
-          </div>
-          <p>Jangan keluar dari halaman, loading paling lama 30 detik</p>
-      </div>
-  </div>
-  <div class="container">
-      <h1>List Model Stable Diffusion XL</h1>
-      <p class="lead"></p>
-      <form id="inputForm" class="mt-4">
-          <div class="mb-3">
-              <label for="model" class="form-label">Model</label>
-              <input type="text" class="form-control" id="model" required>
-          </div>
-          <div class="mb-3">
-              <label for="prompt" class="form-label">Prompt</label>
-              <input type="text" class="form-control" id="prompt" required>
-          </div>
-          <button type="button" id="goButton" class="btn btn-primary" disabled>Go</button>
-      </form>
-      <ul class="mt-4">
-          ${formattedResponse}
-      </ul>
-      <button id="copyAllButton" class="btn btn-secondary">Copy All</button>
-  </div>
-  <script>
-      function copyToClipboard(text) {
-          navigator.clipboard.writeText(text);
-          alert('Copied to clipboard');
-      }
-
-      function updateLink() {
-          const model = $('#model').val().trim();
-          const prompt = $('#prompt').val().trim();
-          if (model && prompt) {
-              $('#goButton').prop('disabled', false);
-              $('#exExample').attr('href', \`https://nue-api.vercel.app/api/sdxl?model=\${model}&prompt=\${prompt}\`);
-          } else {
-              $('#goButton').prop('disabled', true);
-          }
-      }
-
-      $('#model, #prompt').on('input', updateLink);
-
-      $('#goButton').on('click', function() {
-          const model = $('#model').val().trim();
-          const prompt = $('#prompt').val().trim();
-          if (model && prompt) {
-              $('#loading').show();
-              $('body').css('overflow', 'hidden');
-              setTimeout(() => {
-                  window.location.href = \`https://nue-api.vercel.app/api/sdxl?model=\${model}&prompt=\${prompt}\`;
-              }, 1000); // Simulating a delay for loading spinner visibility
-          }
-      });
-
-      $('#copyAllButton').on('click', function() {
-          const items = ${JSON.stringify(response.data)};
-          copyToClipboard(JSON.stringify(items));
-      });
-  </script>
-</body>
-</html>
-`;
-            res.send(htmlResponse);
+            res.json({status: 200, result: response.data});
         })
         .catch(function (error) {
-            res.send("Error fetching list");
+            res.json({status: 500, message: "Error fetching list"});
         });
 };
 
