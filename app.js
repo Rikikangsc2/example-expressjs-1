@@ -50,6 +50,8 @@ async function writeData(userId, data) {
 }
 
 //*
+app.get('/sdlist',async(req,res)=>{await sdList(res)})
+app.get('/sdxllist',async(req,res)=>{await sdxlList(res)});
 app.get('/count', async (req, res) => {
   try {
     let data = await readData();
@@ -110,8 +112,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/hasil.jpeg', express.static(path.join(__dirname, 'hasil.jpeg')));
 
-app.get('/sdlist',async(req,res)=>{await sdList(res)})
-app.get('/sdxllist',async(req,res)=>{await sdxlList(res)})
 //Router
 
 app.get('/bard', async (req, res)=>{
