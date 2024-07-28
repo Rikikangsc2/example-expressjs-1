@@ -50,6 +50,9 @@ async function writeData(userId, data) {
 }
 
 //*
+app.get('/', (req, res) => {
+res.json({status: 200, message: 'NueApi Server is running'});
+});
 app.use(async (req, res, next) => {
   const { key } = req.query;
 
@@ -475,10 +478,6 @@ app.get('/gpt', async (req, res) => {
         console.log(err)
         res.json({status: 500, message: 'Terjadi kesalahan pada server kami'});
     }
-});
-
-app.get('/', (req, res) => {
-res.json({status: 200, message: 'NueApi Server is running'});
 });
 
 app.get('/snapsave', async (req, res) => {
