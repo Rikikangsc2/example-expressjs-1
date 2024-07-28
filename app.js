@@ -50,6 +50,17 @@ async function writeData(userId, data) {
 }
 
 //*
+app.get('/',async (req,res) =>{
+    res.send(`<html>
+    <head>
+    <title>Nue Api</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+    <h1>side server berjalan tanpa masalah</h1>
+    </body>
+    <\html>`)
+});
 app.get('/count', async (req, res) => {
   try {
     let data = await readData();
