@@ -435,7 +435,7 @@ app.get('/image', async (req, res) => {
       const json = { endpoint:base+"/api/image?query="+encodeURIComponent(query), result: selectedUrls };
       res.status(200).json(json);
     } else {
-      res.redirect(failed);
+      res.status(404).json({ error: 'No images found' });
     }
   } catch (error) {
     console.error(error);
