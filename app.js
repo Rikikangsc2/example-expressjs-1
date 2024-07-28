@@ -50,6 +50,7 @@ async function writeData(userId, data) {
 }
 
 //*
+app.set('json spaces', 2);
 app.get('/',async (req,res) =>{
     res.send(`<html>
     <head>
