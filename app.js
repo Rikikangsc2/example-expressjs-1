@@ -50,6 +50,37 @@ async function writeData(userId, data) {
 }
 
 //*
+app.get('/count', async (req, res) => {
+  try {
+    let data = await readData();
+    const currentDate = new Date().getDate();
+
+    if (currentDate !== data.lastDate) {
+      data.yesterday = data.today;
+      data.today = 0;
+      data.lastDate = currentDate;
+    }
+
+    data.today += 1;
+    data.total += 1;
+
+    await writeData(userId ,data);
+    res.json(data);
+  } catch (error) {
+      console.error('Error reading data:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.get('/read', async (req, res) => {
+  try {
+    const data = await readData();
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 app.get('/', (req, res) => {
 res.json({status: 200, message: 'NueApi Server is running'});
 });
@@ -82,37 +113,6 @@ app.use('/hasil.jpeg', express.static(path.join(__dirname, 'hasil.jpeg')));
 app.get('/sdlist',async(req,res)=>{await sdList(res)})
 app.get('/sdxllist',async(req,res)=>{await sdxlList(res)})
 //Router
-
-app.get('/count', async (req, res) => {
-  try {
-    let data = await readData();
-    const currentDate = new Date().getDate();
-
-    if (currentDate !== data.lastDate) {
-      data.yesterday = data.today;
-      data.today = 0;
-      data.lastDate = currentDate;
-    }
-
-    data.today += 1;
-    data.total += 1;
-
-    await writeData(userId ,data);
-    res.json(data);
-  } catch (error) {
-      console.error('Error reading data:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
-app.get('/read', async (req, res) => {
-  try {
-    const data = await readData();
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
 
 app.get('/bard', async (req, res)=>{
     if (!req.query.text) return res.status(400).json({status: 400, message: "Masukkan parameter text"});
