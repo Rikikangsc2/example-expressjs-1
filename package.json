@@ -11,13 +11,13 @@
   "license": "ISC",
   "dependencies": {
     "@bochilteam/scraper": "^5.0.1",
-    "@distube/ytdl-core": "^4.13.5",
     "axios": "^1.7.2",
     "body-parser": "^1.20.2",
     "express": "^4.19.2",
     "form-data": "^4.0.0",
     "g-i-s": "^2.1.7",
     "node-tesseract-ocr": "^2.2.1",
-    "rsnchat": "^4.0.1"
+    "rsnchat": "^4.0.1",
+    "ytdl-core": "github:Rikikangsc2/node-ytdl-core"
   }
 }

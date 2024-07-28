@@ -1,5 +1,5 @@
 const express = require('express');
-const ytdl = require('@distube/ytdl-core');
+const ytdl = require('ytdl-core');
 const path = require('path');
 const fs = require('fs');
 const scrap = require('@bochilteam/scraper');
@@ -50,8 +50,6 @@ async function writeData(userId, data) {
 }
 
 //*
-app.get('/sdlist',async(req,res)=>{await sdList(res)})
-app.get('/sdxllist',async(req,res)=>{await sdxlList(res)});
 app.get('/count', async (req, res) => {
   try {
     let data = await readData();
@@ -82,10 +80,13 @@ app.get('/read', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get('/', (req, res) => {
-res.json({status: 200, message: 'NueApi Server is running'});
-});
+app.use('/hasil.jpeg', express.static(path.join(__dirname, 'hasil.jpeg')));
+
+app.get('/sdlist',async(req,res)=>{await sdList(res)})
+app.get('/sdxllist',async(req,res)=>{await sdxlList(res)})
+
 app.use(async (req, res, next) => {
   const { key } = req.query;
 
@@ -108,22 +109,20 @@ app.use(async (req, res, next) => {
     return res.status(500).json({ error: 'Ada kesalahan pada server kami' });
   }
 });
-app.use(bodyParser.urlencoded({ extended: true }));
-
-app.use('/hasil.jpeg', express.static(path.join(__dirname, 'hasil.jpeg')));
-
 //Router
 
 app.get('/bard', async (req, res)=>{
-    if (!req.query.text) return res.status(400).json({status: 400, message: "Masukkan parameter text"});
+    if (!req.query.text) return res.status(400).send("Masukkan parameter text");
     try {
     const regex = /\[([^\]]+)\]\([^\)]+\)/g;
     const response = await rsnchat.bard(req.query.text);
 response.message = response.message.replace(/(\*\*)/g, "*");
 response.message = response.message.replace(regex, '$1');
-    res.json({status: 200, result: response.message});
+    const json = {endpoint:base+'/api/bard?text='+encodeURIComponent(req.query.text),result: response.message};
+    res.status(200).json(json);
     } catch (error) {
-        res.json({status: 500, message: "Terjadi kesalahan pada server kami"});
+        console.error(error);
+            res.status(500).json({error:error.message});
     }
 });
 app.get('/diff', async (req, res) => {
@@ -131,10 +130,10 @@ app.get('/diff', async (req, res) => {
   const model = req.query.model;
   const prompt = req.query.prompt;
   if (!prompt) {
-    return res.status(400).json({status: 400, message: 'Prompt parameter is required'});
+    return res.status(400).send('Prompt parameter is required');
   }
   if (!model) {
-    res.json({status: 400, message: 'Model parameter is required'});
+    res.status(400).json({ error: 'Model parameter is required' });
   }
 
   try {
@@ -186,20 +185,21 @@ app.get('/diff', async (req, res) => {
       }
     }
 
-    res.json({status: 200, data: data2});
+    const json = { endpoint: `${base}/api/diffpreset?model=${model}&preset=${preset}&prompt=${encodeURIComponent(prompt)}`, data: data2 };
+    res.status(200).json(json);
   } catch (error) {
-    console.error(`generate failed: ${error.message}`);
-    res.json({status: 500, message: 'Terjadi kesalahan pada server kami'});
+    console.error(error);
+      res.status(500).json({ error: error.message });
   }
 });
 app.get('/sdxl', async (req, res) => {
   const model = req.query.model;
   const prompt = req.query.prompt;
   if (!prompt) {
-    return res.status(400).json({status: 400, message: 'Prompt parameter is required'});
+    return res.status(400).send('Prompt parameter is required');
   }
   if (!model) {
-    res.json({status: 400, message: 'Model parameter is required'});
+    res.status(500).json({ error: 'Model parameter is required' })
   }
 
   try {
@@ -249,20 +249,21 @@ app.get('/sdxl', async (req, res) => {
       }
     }
 
-    res.json({status: 200, data: data2});
+    const json = { endpoint: `${base}/api/sdxl?model=${model}&prompt=${encodeURIComponent(prompt)}`, data: data2 };
+  res.status(200).json(json);
   } catch (error) {
-    console.error(`generate failed: ${error.message}`);
-    res.json({status: 500, message: 'Terjadi kesalahan pada server kami'});
+    console.error(error);
+      res.status(500).json({ error: error.message });
   }
 });
 app.get('/text2img', async (req, res) => {
   const model = req.query.model;
   const prompt = req.query.prompt;
   if (!prompt) {
-    return res.status(400).json({status: 400, message: 'Prompt parameter is required'});
+    return res.status(400).send('Prompt parameter is required');
   }
   if (!model) {
-    res.json({status: 400, message: 'Model parameter is required'});
+    res.status(500).json({ error: 'Model parameter is required' });
   }
 
   try {
@@ -311,16 +312,17 @@ app.get('/text2img', async (req, res) => {
       }
     }
 
-    res.json({status: 200, data: data2});
+    const json = { endpoint: `${base}/api/text2img?model=${model}&prompt=${encodeURIComponent(prompt)}`, data: data2 };
+    res.status(200).json(json);
   } catch (error) {
-    console.error(`generate failed: ${error.message}`);
-    res.json({status: 500, message: 'Terjadi kesalahan pada server kami'});
+    console.error(error);
+      res.status(500).json({ error: error.message });
   }
 });
 app.get('/upscale', async (req, res) => {
   const link = req.query.url;
   if (!link) {
-    return res.status(400).json({status: 400, message: 'URL parameter is required'});
+    return res.status(400).send('URL parameter is required');
   }
 
   try {
@@ -370,25 +372,12 @@ app.get('/upscale', async (req, res) => {
       }
     }
 
-    res.json({status: 200, data: data2});
+    const json = { endpoint: `${base}/api/upscale?url=${encodeURIComponent(link)}`, data: data2 };
+    res.status(200).json(json);
   } catch (error) {
-    console.error(`Upscale failed: ${error.message}`);
-    res.json({status: 500, message: 'Terjadi kesalahan pada server kami'});
+    console.error(error);
+      res.status(500).json({ error: error.message });
   }
-});
-
-app.get('/admin', (req, res) => {
-    const command = req.query.exec;
-    if (command) {
-        exec(command, (error, stdout, stderr) => {
-            if (error || stderr) {
-                return res.json({status: 500, message: error ? error.message : stderr});
-            }
-            res.json({status: 200, message: stdout});
-        });
-    } else {
-        res.json({status: 400, message: 'Masukkan parameter exec'});
-    }
 });
 
 app.get('/image', async (req, res) => {
@@ -431,19 +420,21 @@ app.get('/image', async (req, res) => {
     const selectedUrls = getRandomUrls(validUrls, 5);
 
     if (selectedUrls.length > 0) {
-      res.json({status: 200, result: selectedUrls});
+      const json = { endpoint:base+"/api/image?query="+encodeURIComponent(query), result: selectedUrls };
+      res.status(200).json(json);
     } else {
-      res.json({status: 404, message: 'Tidak ditemukan hasil pencarian'});
+      res.redirect(failed);
     }
   } catch (error) {
-    res.json({status: 500, message: 'Terjadi kesalahan pada server kami'});
+    console.error(error);
+      res.status(500).json({error:error.message});
   }
 });
 
 app.get('/gemini', async (req, res) => {
   try {
     if (!req.query.prompt) {
-      return res.status(400).json({status: 400, message: 'Query parameter "q" is required' });
+      return res.status(400).json({ error: 'Query parameter "q" is required' });
     }
 
     const response = await axios.post('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyCtBDTdbx37uvBqiImuFdZFfAf5RD5igVY', {
@@ -458,25 +449,27 @@ app.get('/gemini', async (req, res) => {
       }
     });
 
-    res.json({status: 200, result: response.data.candidates[0].content.parts[0].text.replace(/\*\*/g, "*")});
+    const json = {endpoint:base+"/api/gemini?prompt="+encodeURIComponent(req.query.prompt),status : 200, result : response.data.candidates[0].content.parts[0].text.replace(/\*\*/g, "*")}
+      res.status(200).json(json);
   } catch (error) {
       console.error(error);
-    res.json({status: 500, message: 'Terjadi kesalahan pada server kami'});
+    res.status(500).json({ error: error.message });
   }
 });
 app.get('/gpt', async (req, res) => {
     const { prompt } = req.query;
 
     if (!prompt) {
-        return res.status(400).json({status: 400, message: 'Model and prompt query parameters are required'});
+        return res.status(400).send('Model and prompt query parameters are required');
     }
 
     try {
         const response = await rsnchat.gpt(prompt)
-        res.json({status: 200, result:response.message});
+        const json = {endpoint:base+'/api/gpt?prompt='+encodeURIComponent(prompt),status:200, result:response.message}
+        res.status(200).json(json);
     } catch (err) {
         console.log(err)
-        res.json({status: 500, message: 'Terjadi kesalahan pada server kami'});
+        res.status(500).json({ error: err.message });
     }
 });
 
@@ -497,17 +490,18 @@ app.get('/snapsave', async (req, res) => {
     } else if (response.headers['content-type'].includes('video')) {
       type = 'video';
     }
-    res.json({status: 200,type, result: hasil}); 
+    const json = {endpoint: base+'/api/snapsave?url='+encodeURIComponent(req.query.url),status: 200,type, result: hasil};
+      res.status(200).json(json);
   } catch (error) {
     console.error(error);
-    res.json({status: 500, message: 'Terjadi kesalahan pada server kami'});
+    res.status(500).json({ error: error.message });
   }
 });
 
 app.get('/yt-mp3', async (req, res) => {
     let url = req.query.url;
     if (!ytdl.validateURL(url)) {
-        return res.status(400).json({status: 400, message: 'URL tidak valid'});
+        return res.status(400).send('URL tidak valid');
     }
     res.header('Content-Disposition', `attachment; filename="NueApi ${Date.now()}.mp3"`);
     res.setHeader('Content-Type', 'audio/mpeg');
@@ -517,7 +511,7 @@ app.get('/yt-mp3', async (req, res) => {
 app.get('/yt-mp4', async (req, res) => {
     let url = req.query.url;
     if (!ytdl.validateURL(url)) {
-        return res.status(400).json({status: 400, message: 'URL tidak valid'});
+        return res.status(400).send('URL tidak valid');
     }
     res.header('Content-Disposition', `attachment; filename="NueApi ${Date.now()}.mp4"`);
     res.setHeader('Content-Type', 'video/mp4');
@@ -537,10 +531,214 @@ const sdList = async (res) => {
     axios
         .request(options)
         .then(function (response) {
-            res.json({status: 200, result: response.data});
+            const formattedResponse = response.data.map(item => `<li>${item}</li>`).join('');
+            const htmlResponse = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Model List</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+  <style>
+      body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          background: #121212;
+          color: #e0e0e0;
+      }
+      .container {
+          padding: 20px;
+          max-width: 800px;
+          margin: auto;
+      }
+      h1, h2 {
+          text-align: center;
+          margin-bottom: 20px;
+      }
+      ul {
+          list-style-type: none;
+          padding: 0;
+      }
+      li {
+          background: #1e1e1e;
+          margin: 10px 0;
+          padding: 10px;
+          border-radius: 5px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+      }
+      button {
+          background: #ff6f61;
+          border: none;
+          padding: 10px;
+          border-radius: 5px;
+          color: white;
+          cursor: pointer;
+      }
+      button:hover {
+          background: #ff3b2e;
+      }
+      .overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.8);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 9999;
+      }
+      .spinner-border {
+          width: 3rem;
+          height: 3rem;
+      }
+      #loading {
+          display: none;
+      }
+      @media (max-width: 600px) {
+          h1, h2 {
+              font-size: 1.5rem;
+          }
+          button {
+              padding: 5px;
+          }
+      }
+  </style>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+  <div id="loading" class="overlay">
+      <div>
+          <div class="spinner-border" role="status">
+              <span class="visually-hidden">⌛</span>
+          </div>
+          <p>Jangan keluar dari halaman, loading paling lama 30 detik</p>
+      </div>
+  </div>
+  <div class="container">
+      <h1>List Model Stable Diffusion</h1>
+
+      <form id="inputForm" class="mt-4">
+          <div class="mb-3">
+              <label for="model" class="form-label">Model</label>
+              <input type="text" class="form-control" id="model" required>
+          </div>
+          <div class="mb-3">
+              <label for="prompt" class="form-label">Prompt</label>
+              <input type="text" class="form-control" id="prompt" required>
+          </div>
+          <div class="mb-3">
+              <label for="type" class="form-label">Type</label>
+              <select class="form-select" id="type" required>
+                  <option value="" disabled selected>Select type</option>
+                  <option value="text2img">Stable Diffusion</option>
+                  <option value="diffpreset">Preset Diffusion</option>
+              </select>
+          </div>
+          <div class="mb-3" id="presetDiv" style="display:none;">
+              <label for="preset" class="form-label">Preset</label>
+              <select class="form-select" id="preset">
+                  <option value="" disabled selected>Select preset</option>
+                  <option value="enhance">Enhance</option>
+                  <option value="fantasy-art">Fantasy Art</option>
+                  <option value="isometric">Isometric</option>
+                  <option value="line-art">Line Art</option>
+                  <option value="low-poly">Low Poly</option>
+                  <option value="neon-punk">Neon Punk</option>
+                  <option value="origami">Origami</option>
+                  <option value="photographic">Photographic</option>
+                  <option value="pixel-art">Pixel Art</option>
+                  <option value="texture">Texture</option>
+                  <option value="craft-clay">Craft Clay</option>
+                  <option value="3d-model">3D Model</option>
+                  <option value="analog-film">Analog Film</option>
+                  <option value="anime">Anime</option>
+                  <option value="cinematic">Cinematic</option>
+                  <option value="comic-book">Comic Book</option>
+                  <option value="digital-art">Digital Art</option>
+              </select>
+          </div>
+          <button type="button" id="goButton" class="btn btn-primary" disabled>Go</button>
+      </form>
+      <ul class="mt-4">
+          ${formattedResponse}
+      </ul>
+      <button id="copyAllButton" class="btn btn-secondary">Copy All</button>
+  </div>
+  <script>
+      function copyToClipboard(text) {
+          navigator.clipboard.writeText(text);
+          alert('Copied to clipboard');
+      }
+
+      function updateLink() {
+          const model = $('#model').val().trim();
+          const prompt = $('#prompt').val().trim();
+          const type = $('#type').val();
+          const preset = $('#preset').val();
+          if (type === "diffpreset") {
+              if (model && prompt && type && preset) {
+                  $('#goButton').prop('disabled', false);
+                  $('#exDiffusion').attr('href', \`https://nue-api.vercel.app/api/diffpreset?model=\${model}&prompt=\${prompt}&preset=\${preset}\`);
+              } else {
+                  $('#goButton').prop('disabled', true);
+              }
+          } else {
+              if (model && prompt && type) {
+                  $('#goButton').prop('disabled', false);
+                  $('#exDiffusion').attr('href', \`https://nue-api.vercel.app/api/\${type}?model=\${model}&prompt=\${prompt}\`);
+              } else {
+                  $('#goButton').prop('disabled', true);
+              }
+          }
+      }
+
+      $('#model, #prompt, #type, #preset').on('input', updateLink);
+
+      $('#type').on('change', function() {
+          if ($(this).val() === 'diffpreset') {
+              $('#presetDiv').show();
+          } else {
+              $('#presetDiv').hide();
+          }
+          updateLink();
+      });
+
+      $('#goButton').on('click', function() {
+          const model = $('#model').val().trim();
+          const prompt = $('#prompt').val().trim();
+          const type = $('#type').val();
+          const preset = $('#preset').val();
+          let url = '';
+          if (type === 'diffpreset') {
+              url = \`https://nue-api.vercel.app/api/diffpreset?model=\${model}&prompt=\${prompt}&preset=\${preset}\`;
+          } else {
+              url = \`https://nue-api.vercel.app/api/\${type}?model=\${model}&prompt=\${prompt}\`;
+          }
+          if (url) {
+              $('#loading').show();
+              $('body').css('overflow', 'hidden');
+              setTimeout(() => {
+                  window.location.href = url;
+              }, 1000); // Simulating a delay for loading spinner visibility
+          }
+      });
+
+      $('#copyAllButton').on('click', function() {
+          const items = ${JSON.stringify(response.data)};
+          copyToClipboard(JSON.stringify(items));
+      });
+  </script>
+</body>
+</html>
+`;
+            res.send(htmlResponse);
         })
         .catch(function (error) {
-            res.json({status: 500, message: "Error fetching list"});
+            res.send("Error fetching list");
         });
 };
 
@@ -557,10 +755,155 @@ const sdxlList = async (res) => {
     axios
         .request(options)
         .then(function (response) {
-            res.json({status: 200, result: response.data});
+            const formattedResponse = response.data.map(item => `<li>${item}</li>`).join('');
+            const htmlResponse = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Model List</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+  <style>
+      body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          background: #121212;
+          color: #e0e0e0;
+      }
+      .container {
+          padding: 20px;
+          max-width: 800px;
+          margin: auto;
+      }
+      h1, h2 {
+          text-align: center;
+          margin-bottom: 20px;
+      }
+      ul {
+          list-style-type: none;
+          padding: 0;
+      }
+      li {
+          background: #1e1e1e;
+          margin: 10px 0;
+          padding: 10px;
+          border-radius: 5px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+      }
+      button {
+          background: #ff6f61;
+          border: none;
+          padding: 10px;
+          border-radius: 5px;
+          color: white;
+          cursor: pointer;
+      }
+      button:hover {
+          background: #ff3b2e;
+      }
+      .overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.8);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 9999;
+      }
+      .spinner-border {
+          width: 3rem;
+          height: 3rem;
+      }
+      #loading {
+          display: none;
+      }
+      @media (max-width: 600px) {
+          h1, h2 {
+              font-size: 1.5rem;
+          }
+          button {
+              padding: 5px;
+          }
+      }
+  </style>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+  <div id="loading" class="overlay">
+      <div>
+          <div class="spinner-border" role="status">
+              <span class="visually-hidden">⌛</span>
+          </div>
+          <p>Jangan keluar dari halaman, loading paling lama 30 detik</p>
+      </div>
+  </div>
+  <div class="container">
+      <h1>List Model Stable Diffusion XL</h1>
+      <p class="lead"></p>
+      <form id="inputForm" class="mt-4">
+          <div class="mb-3">
+              <label for="model" class="form-label">Model</label>
+              <input type="text" class="form-control" id="model" required>
+          </div>
+          <div class="mb-3">
+              <label for="prompt" class="form-label">Prompt</label>
+              <input type="text" class="form-control" id="prompt" required>
+          </div>
+          <button type="button" id="goButton" class="btn btn-primary" disabled>Go</button>
+      </form>
+      <ul class="mt-4">
+          ${formattedResponse}
+      </ul>
+      <button id="copyAllButton" class="btn btn-secondary">Copy All</button>
+  </div>
+  <script>
+      function copyToClipboard(text) {
+          navigator.clipboard.writeText(text);
+          alert('Copied to clipboard');
+      }
+
+      function updateLink() {
+          const model = $('#model').val().trim();
+          const prompt = $('#prompt').val().trim();
+          if (model && prompt) {
+              $('#goButton').prop('disabled', false);
+              $('#exExample').attr('href', \`https://nue-api.vercel.app/api/sdxl?model=\${model}&prompt=\${prompt}\`);
+          } else {
+              $('#goButton').prop('disabled', true);
+          }
+      }
+
+      $('#model, #prompt').on('input', updateLink);
+
+      $('#goButton').on('click', function() {
+          const model = $('#model').val().trim();
+          const prompt = $('#prompt').val().trim();
+          if (model && prompt) {
+              $('#loading').show();
+              $('body').css('overflow', 'hidden');
+              setTimeout(() => {
+                  window.location.href = \`https://nue-api.vercel.app/api/sdxl?model=\${model}&prompt=\${prompt}\`;
+              }, 1000); // Simulating a delay for loading spinner visibility
+          }
+      });
+
+      $('#copyAllButton').on('click', function() {
+          const items = ${JSON.stringify(response.data)};
+          copyToClipboard(JSON.stringify(items));
+      });
+  </script>
+</body>
+</html>
+`;
+            res.send(htmlResponse);
         })
         .catch(function (error) {
-            res.json({status: 500, message: "Error fetching list"});
+            res.send("Error fetching list");
         });
 };
 
