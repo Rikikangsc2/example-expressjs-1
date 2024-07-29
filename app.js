@@ -450,7 +450,7 @@ app.get('/gemini', async (req, res) => {
 
     const response = await rsnchat.gemini(req.query.prompt);
 
-    const json = {endpoint:base+"/api/gemini?prompt="+encodeURIComponent(req.query.prompt),status : 200, result : response}
+    const json = {endpoint:base+"/api/gemini?prompt="+encodeURIComponent(req.query.prompt),status : 200, result : response.message.replace(/\*\*/g, "*")}
       res.status(200).json(json);
   } catch (error) {
       console.error(error);
