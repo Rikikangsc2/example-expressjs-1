@@ -340,7 +340,7 @@ app.get('/upscale', async (req, res) => {
     // Mengunduh gambar dari URl
     const response = await axios.get(link, { responseType: 'arraybuffer' });
     fs.writeFileSync('hasil.jpeg', response.data);
-    const imageData = await axios.get(`https://wily-dory-pakpurpur-b5600d6d.koyeb.app/hasil.jpeg`, { responseType: 'arraybuffer' });
+    const imageData = await axios.get(`https://nue-api.koyeb.app/hasil.jpeg`, { responseType: 'arraybuffer' });
     const base64Image = Buffer.from(imageData.data).toString('base64');
     const options = {
       method: 'POST',
