@@ -406,39 +406,21 @@ app.get('/image', async (req, res) => {
     });
 
     const urls = results
-      .filter(result => result.width >= 800 && result.height >= 600)
+      .sort((a, b) => (b.width * b.height) - (a.width * a.height))
+      .slice(0, 10)
       .map(result => result.url);
 
-    const checkUrl = async (url) => {
-      try {
-        const response = await axios.head(url);
-        return (response.status === 200 && response.headers['content-type'].startsWith('image')) ? url : null;
-      } catch (error) {
-        return null;
-      }
-    };
-
-    // Verify URLs
-    const verifiedUrls = await Promise.all(urls.map(url => checkUrl(url)));
-    const validUrls = verifiedUrls.filter(url => url !== null);
-
-    // Select 5 random URLs
-    const getRandomUrls = (array, num) => {
-      const shuffled = array.sort(() => 0.5 - Math.random());
-      return shuffled.slice(0, num);
-    };
-
-    const selectedUrls = getRandomUrls(validUrls, 5);
-
-    if (selectedUrls.length > 0) {
-      const json = { endpoint:base+"/api/image?query="+encodeURIComponent(query), result: selectedUrls };
+    if (urls.length > 0) {
+      const json = {
+          endpoint:base+"/api/image?query="+encodeURIComponent(query),
+          rekomendasi: urls[0], result: urls };
       res.status(200).json(json);
     } else {
       res.status(404).json({ error: 'No images found' });
     }
   } catch (error) {
     console.error(error);
-      res.status(500).json({error:error.message});
+    res.status(500).json({error:error.message});
   }
 });
 
