@@ -51,6 +51,9 @@ async function writeData(userId, data) {
 
 //*
 app.set('json spaces', 2);
+app.get('/docs',function (req, res){
+    res.redirect(base+'/docs')
+})
 app.get('/',async (req,res) =>{
     const response = await axios.get(base);
     res.send(response.data);
