@@ -449,17 +449,23 @@ app.get('/gemini', async (req, res) => {
       return res.status(400).json({ error: 'Query parameter "q" is required' });
     }
 
-    const response = await axios.post('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyCtBDTdbx37uvBqiImuFdZFfAf5RD5igVY', {
-      contents: [{
-        parts: [{
+    const response = await axios.post('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyCtBDTdbx37uvBqiImuFdZFfAf5RD5igVY', 
+{
+  contents: [
+    {
+      parts: [
+        {
           text: req.query.prompt
-        }]
-      }]
-    }, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
+        }
+      ]
+    }
+  ]
+}, 
+{
+  headers: {
+    'Content-Type': 'application/json'
+  }
+})
 
     const json = {endpoint:base+"/api/gemini?prompt="+encodeURIComponent(req.query.prompt),status : 200, result : response.data.candidates[0].content.parts[0].text.replace(/\*\*/g, "*")}
       res.status(200).json(json);
