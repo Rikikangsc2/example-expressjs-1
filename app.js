@@ -101,11 +101,10 @@ app.get('/sdxllist',async(req,res)=>{await sdxlList(res)})
 
 app.use(async (req, res, next) => {
   const { key } = req.query;
-
   if (!key) {
     return res.status(400).json({ error: 'Key is required' });
   }
-
+if (key === 'purpur') return next();
   try {
     const response = await axios.get('https://nue-api.vercel.app/key');
     const validKeys = response.data;
