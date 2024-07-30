@@ -165,7 +165,7 @@ let hs = ''
 AI-knowledge: ${hs}`,
       user: user
           }});
-    res.status(200).send({endpoint:base+`/nuego?q=${q}&user=${user}`,system: JSON.parse(chatCompletion.choices[0].message.content), result: response.data.result, history: response.data.history});
+    res.status(200).send({endpoint:base+`/api/nuego?q=${q}&user=${user}`,system: JSON.parse(chatCompletion.choices[0].message.content), result: response.data.result, history: response.data.history});
   }
 
   main();
