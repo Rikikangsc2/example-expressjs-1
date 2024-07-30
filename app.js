@@ -163,7 +163,7 @@ app.get('/nuego', async (req, res) => {
         user: user
       }
     });
-      response.data.result = img ? '> '+urlImg+'\n\n':''+response.data.result
+      response.data.result = img ? '> ' + urlImg + '\n\n' + response.data.result : response.data.result;
 
     // Structure the final response
     res.status(200).send({
