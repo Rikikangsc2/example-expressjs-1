@@ -133,7 +133,7 @@ app.get('/nuego', async (req, res) =>{
               systemPrompt:`Anda adalah AI bernama nuego anda adalah AI dengan pengetahuan real-time dan sudah terintegrasi dengan google.\nAI-knowledge: ${hs}`,
               user: user
                   }});
-            res.status(200).send({endpoint:base+`/api/nuego?q=${q}&user=${user}`,system: JSON.parse(chatCompletion.choices[0].message.content), result: response.data.result, history: response.data.history});
+            res.status(200).send({endpoint:base+`/api/nuego?q=${q}&user=${user}`,system: sistem.data, result: response.data.result, history: response.data.history});
     } catch (error) {
         console.error('Error:', error);
         res.status(500).json({error:error.message})
