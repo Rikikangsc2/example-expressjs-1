@@ -11,11 +11,6 @@ const gis = require('g-i-s');
 const bodyParser = require('body-parser');
 const { exec } = require('child_process');
 const { RsnChat } = require("rsnchat");
-const Groq = require('groq-sdk');
-
-const key = ['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','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','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']
-const randomKey = key[Math.floor(Math.random() * key.length)];
-const groq = new Groq({ apiKey: randomKey });
 
 const rsnchat = new RsnChat("rsnai_SQPKHQEtlKlh8s9cjovGIiOp");
 
@@ -125,51 +120,23 @@ if (key === 'purpur') return next();
 app.get('/nuego', async (req, res) =>{
   const {user, q} = req.query;
   if (!q && !user) return res.status(400).send('Masukan parameter q dan user');
-  async function main() {
-    const chatCompletion = await groq.chat.completions.create({
-      "messages": [
-        {
-          "role": "system",
-          "content": "Anda adalah AI pendeteksi prompt, anda dapat mendeteksi permintaan untuk anda hanya dapat membalas dengan:\n{ text: [text_pengguna]\\ngoogle_search: [true/false]\\nquery_search: [buat query google_search bernilai true]}\n\nFormat json : {text, google_search, query_search}\n"
-        },
-        {
-          "role": "user",
-          "content": "Hallo apa kabar, info gempa bumi terbaru ada Ngga"
-        },
-        {
-          "role": "assistant",
-          "content": "{\n \"text\": \"Hallo apa kabar, info gempa bumi terbaru ada Ngga\",\n \"google_search\": true,\n \"query_search\": \"info gempa bumi terbaru\"\n} \n"
-        },
-        {
-          "role": "user",
-          "content": q
-        }
-      ],
-      "model": "gemma2-9b-it",
-      "temperature": 0.1,
-      "max_tokens": 1024,
-      "top_p": 1,
-      "stream": false,
-      "stop": null
-    });
-    const {text, google_search, query_search} = JSON.parse(chatCompletion.choices[0].message.content);
-let hs = ''
-    if (google_search) {
-      const hasil = await axios.get(`https://nue-api.vercel.app/api/google?limit=5&query=${query_search}`);
-      hs = hasil.data.map(item => `${item.title}, ${item.snippet}, ${item.link}`).join('\n');
+    try {
+              const sistem = await axios.get(base+'/sistem',{params:{text:q, user:user+'sistemV1'}});
+            const {text, google_search, query_search} = sistem.data;
+        let hs = ''
+            if (google_search) {
+              const hasil = await axios.get(`https://nue-api.vercel.app/api/google?limit=5&query=${query_search}`);
+              hs = hasil.data.map(item => `${item.title}, ${item.snippet}, ${item.link}`).join('\n');
+            }
+            const response = await axios.get('https://nue-api.vercel.app/api/lgpt', {params: {
+              text: text,
+              systemPrompt:`Anda adalah AI bernama nuego anda adalah AI dengan pengetahuan real-time dan sudah terintegrasi dengan google.\nAI-knowledge: ${hs}`,
+              user: user
+                  }});
+            res.status(200).send({endpoint:base+`/api/nuego?q=${q}&user=${user}`,system: JSON.parse(chatCompletion.choices[0].message.content), result: response.data.result, history: response.data.history});
+    } catch (error) {
+        
     }
-    const response = await axios.get('https://nue-api.vercel.app/api/lgpt', {params: {
-      text: text,
-      systemPrompt:`Anda adalah AI bernama nuego anda adalah AI dengan pengetahuan real-time dan sudah terintegrasi dengan google.
-
-AI-knowledge: ${hs}`,
-      user: user
-          }});
-    res.status(200).send({endpoint:base+`/api/nuego?q=${q}&user=${user}`,system: JSON.parse(chatCompletion.choices[0].message.content), result: response.data.result, history: response.data.history});
-  }
-
-  main();
-
 });
 app.get('/bard', async (req, res)=>{
     if (!req.query.text) return res.status(400).send("Masukkan parameter text");
