@@ -531,7 +531,7 @@ app.get('/snapsave', async (req, res) => {
 
     // Get content type from the first result URL
     const response = await axios.head(hasil[0].url);
-    let type = 'unknown';
+    let type = 'video';
     if (response.headers['content-type'].includes('image')) {
       type = 'image';
     } else if (response.headers['content-type'].includes('video')) {
