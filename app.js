@@ -520,7 +520,8 @@ app.get('/snapsave', async (req, res) => {
     }
 
     // Scrape data from the provided URL
-    let hasil = await scrap.snapsave(req.query.url)
+    let hasil = await scrap.snapsave(req.query.url);
+      return res.json(hasil)
     if (!hasil.length) {
       return res.status(404).json({
         status: 404,
