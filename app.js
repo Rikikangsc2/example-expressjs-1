@@ -130,8 +130,8 @@ app.get('/nuego', async (req, res) => {
     const sistemResponse = await axios.get(`https://nue-api.vercel.app/sistem?text=${q}&user=${user}v3`);
     const { text, google_search, query_search, image_generator, query_image } = sistemResponse.data;
 
-    let hs = '';
-    let urlImg = '';
+    let hs = 'Ajukan permintaan!';
+    let urlImg = 'ajukan permintaan!';
 
     // Handle Google search results
     if (google_search) {
@@ -157,7 +157,8 @@ app.get('/nuego', async (req, res) => {
     const response = await axios.get('https://nue-api.vercel.app/api/lgpt', {
       params: {
         text: text,
-        systemPrompt: `Anda adalah AI bernama nuego anda adalah AI dengan pengetahuan real-time dan sudah terintegrasi dengan google dan image generator.\nGoogle-result: ${hs}\nimg-generator-result: ${urlImg}`,
+        systemPrompt: `Anda adalah AI bernama nuego anda adalah AI dengan pengetahuan real-time dan sudah terintegrasi dengan google dan image generator`,
+        aiMessage: `\nGoogle-result: ${hs}\nimg-generator-result: ${urlImg}\n\nAda yang bisa aku bantu?☺️`,
         user: user+'v1'
       }
     });
