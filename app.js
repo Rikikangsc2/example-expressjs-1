@@ -122,15 +122,28 @@ app.get('/nuego', async (req, res) =>{
   if (!q && !user) return res.status(400).send('Masukan parameter q dan user');
     try {
               const sistem = await axios.get(`https://nue-api.vercel.app/sistem?text=${q}&user=${user}v1`);
-            const {text, google_search, query_search} = sistem.data;
+            const {text, google_search, query_search, generator_image, query_image} = sistem.data;
         let hs = ''
+        let urlImg = ''
             if (google_search) {
-              const hasil = await axios.get(`https://nue-api.vercel.app/api/google?limit=5&query=${query_search}`);
+              try {
+                  const hasil = await axios.get(`https://nue-api.vercel.app/api/google?limit=5&query=${query_search}`);
               hs = hasil.data.map(item => `${item.title}, ${item.snippet}, ${item.link}`).join('\n');
+              } catch (error) {
+                  hs = 'Tidak dapat mengambil hasil dari Google';
+              }
             }
+        if (generator_image){
+            try {
+                const hasil = await axios.get(`https://nue-api.vercel.app/api/text2img?model=breakdomain_M2150.safetensors [15f7afca]&prompt=${query_image}`);
+            urlImg = hasil.data.data.imageUrl;
+            } catch (error) {
+                urlImg = 'Tidak dapat mengambil gambar';
+            }
+        }
             const response = await axios.get('https://nue-api.vercel.app/api/lgpt', {params: {
               text: text,
-              systemPrompt:`Anda adalah AI bernama nuego anda adalah AI dengan pengetahuan real-time dan sudah terintegrasi dengan google.\nAI-knowledge: ${hs}`,
+              systemPrompt:`Anda adalah AI bernama nuego anda adalah AI dengan pengetahuan real-time dan sudah terintegrasi dengan google dan image generator.\nGoogle-result: ${hs}\nimg-generator-result: ${urlImg}`,
               user: user
                   }});
             res.status(200).send({endpoint:base+`/api/nuego?q=${q}&user=${user}`,system: sistem.data, result: response.data.result, history: response.data.history});
