@@ -135,7 +135,8 @@ app.get('/nuego', async (req, res) =>{
                   }});
             res.status(200).send({endpoint:base+`/api/nuego?q=${q}&user=${user}`,system: JSON.parse(chatCompletion.choices[0].message.content), result: response.data.result, history: response.data.history});
     } catch (error) {
-        res.status(500).json({error:error})
+        console.error('Error:', error);
+        res.status(500).json({error:error.message})
     }
 });
 app.get('/bard', async (req, res)=>{
