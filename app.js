@@ -131,7 +131,6 @@ app.get('/nuego', async (req, res) => {
     const { text, google_search, query_search, image_generator, query_image } = sistemResponse.data;
 
     let hs = 'Tidak ada hasil google search';
-      let img = false
     let urlImg = 'Tidak ada hasil image generator';
 
     // Handle Google search results
@@ -148,7 +147,6 @@ app.get('/nuego', async (req, res) => {
     if (image_generator && query_image) {
       try {
         const hasilResponse = await axios.get(`https://nue-api.vercel.app/api/text2img?model=breakdomain_M2150.safetensors [15f7afca]&prompt=${query_image}`);
-          img = true
         urlImg = hasilResponse.data.data.imageUrl;
       } catch (error) {
         urlImg = 'Tidak dapat mengambil gambar';
@@ -159,11 +157,11 @@ app.get('/nuego', async (req, res) => {
     const response = await axios.get('https://nue-api.vercel.app/api/lgpt', {
       params: {
         text: text,
-        systemPrompt: `Anda adalah AI bernama nuego anda adalah AI dengan pengetahuan real-time dan sudah terintegrasi dengan google dan image generator.\nGoogle-result: ${hs}\nimg-generator-result: ${urlImg}\n\nnote:jawab menggunakan bahasa yang dipakai user`,
+        systemPrompt: `Anda adalah AI bernama nuego anda adalah AI dengan pengetahuan real-time dan sudah terintegrasi dengan google dan image generator.\nGoogle-result: ${hs}\nimg-generator-result: ${urlImg}\n\nnote: Jangan pernah mengirim kembali url hasil 'img-generator-result' ke dalam percakapan baru`,
         user: user
       }
     });
-      response.data.result = response.data.result.replace(/https?:\/\/\S+/g, (url) => url !== urlImg ? '[!url di hapus tidak valid]' : url);
+      response.data.result = response.data.result.replace(/https?:\/\/\S+/g, match => (match !== urlImg ? (urlImg.match(/https?:\/\/\S+/) ? urlImg : "[!Url di hapus tidak valid]") : urlImg));
 
     // Structure the final response
     res.status(200).send({
