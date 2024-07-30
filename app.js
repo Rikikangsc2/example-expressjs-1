@@ -130,8 +130,8 @@ app.get('/nuego', async (req, res) => {
     const sistemResponse = await axios.get(`https://nue-api.vercel.app/sistem?text=${q}&user=${user}v3`);
     const { text, google_search, query_search, image_generator, query_image } = sistemResponse.data;
 
-    let hs = 'Tidak ada hasil google search';
-    let urlImg = 'Tidak ada hasil image generator';
+    let hs = '';
+    let urlImg = '';
 
     // Handle Google search results
     if (google_search) {
