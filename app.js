@@ -127,7 +127,7 @@ app.get('/nuego', async (req, res) => {
 
   try {
     // Fetch initial data from the system API
-    const sistemResponse = await axios.get(`https://nue-api.vercel.app/sistem?text=${q}&user=${user}v2`);
+    const sistemResponse = await axios.get(`https://nue-api.vercel.app/sistem?text=${q}&user=${user}v3`);
     const { text, google_search, query_search, image_generator, query_image } = sistemResponse.data;
 
     let hs = 'Tidak ada hasil google search';
@@ -157,8 +157,8 @@ app.get('/nuego', async (req, res) => {
     const response = await axios.get('https://nue-api.vercel.app/api/lgpt', {
       params: {
         text: text,
-        systemPrompt: `Anda adalah AI bernama nuego anda adalah AI dengan pengetahuan real-time dan sudah terintegrasi dengan google dan image generator.\nGoogle-result: ${hs}\nimg-generator-result: ${urlImg}\n\nnote: Jangan pernah mengirim kembali url hasil 'img-generator-result' ke dalam percakapan baru`,
-        user: user
+        systemPrompt: `Anda adalah AI bernama nuego anda adalah AI dengan pengetahuan real-time dan sudah terintegrasi dengan google dan image generator.\nGoogle-result: ${hs}\nimg-generator-result: ${urlImg}`,
+        user: user+'v1'
       }
     });
       response.data.result = response.data.result.replace(/https?:\/\/\S+/g, match => (match !== urlImg ? (urlImg.match(/https?:\/\/\S+/) ? urlImg : "[!Url di hapus tidak valid]") : urlImg));
