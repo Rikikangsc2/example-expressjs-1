@@ -510,7 +510,6 @@ app.get('/gpt', async (req, res) => {
 });
 
 app.get('/snapsave', async (req, res) => {
-    let h = ''
   try {
     if (!req.query.url) {
       return res.status(400).json({
@@ -519,8 +518,7 @@ app.get('/snapsave', async (req, res) => {
       });
     }
 
-    const hasil = await scrap.snapsave(req.query.url);
-      h = hasil
+    const hasil = await scrap.snapsave(req.query.url).result;
     const response = await axios.head(hasil[0].url);
     let type = 'video';
     if (response.headers['content-type'].includes('image')) {
@@ -532,7 +530,7 @@ app.get('/snapsave', async (req, res) => {
       res.status(200).json(json);
   } catch (error) {
     console.error(error);
-    res.send(h)
+    res.status(500).json({ error: error.message });
   }
 });
 
