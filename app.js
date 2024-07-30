@@ -164,7 +164,7 @@ app.get('/nuego', async (req, res) => {
 
     // Structure the final response
     res.status(200).send({
-      endpoint: `/api/nuego?q=${q}&user=${user}`,
+      endpoint: `${base}/api/nuego?q=${q}&user=${user}`,
       system: sistemResponse.data,
       result: response.data.result,
       history: response.data.history
