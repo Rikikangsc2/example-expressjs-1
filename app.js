@@ -128,7 +128,7 @@ app.get('/nuego', async (req, res) => {
   try {
     // Fetch initial data from the system API
     const sistemResponse = await axios.get(`https://nue-api.vercel.app/sistem?text=${q}&user=${user}v1`);
-    const { text, google_search, query_search, generator_image, query_image } = sistemResponse.data;
+    const { text, google_search, query_search, image_generator, query_image } = sistemResponse.data;
 
     let hs = '';
     let urlImg = '';
@@ -144,7 +144,7 @@ app.get('/nuego', async (req, res) => {
     }
 
     // Handle image generation
-    if (generator_image) {
+    if (image_generator && query_image) {
       try {
         const hasilResponse = await axios.get(`https://nue-api.vercel.app/api/text2img?model=breakdomain_M2150.safetensors [15f7afca]&prompt=${query_image}`);
         urlImg = hasilResponse.data.data.imageUrl;
