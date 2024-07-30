@@ -143,7 +143,7 @@ app.get('/nuego', async (req, res) =>{
         }
             const response = await axios.get('https://nue-api.vercel.app/api/lgpt', {params: {
               text: text,
-              systemPrompt:`Anda adalah AI bernama nuego anda adalah AI dengan pengetahuan real-time dan sudah terintegrasi dengan google dan image generator.\nGoogle-result: ${hs}\nimg-generator-result: ${urlImg}`,
+              systemPrompt:`Anda adalah AI bernama nuego anda adalah AI dengan pengetahuan real-time dan sudah terintegrasi dengan google dan image generator.\nGoogle-result: ${hs}\nimg-generator-result: ${urlImg}\n\nnote:jawab menggunakan bahasa yang di pake user`,
               user: user
                   }});
             res.status(200).send({endpoint:base+`/api/nuego?q=${q}&user=${user}`,system: sistem.data, result: response.data.result, history: response.data.history});
