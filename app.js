@@ -127,7 +127,7 @@ app.get('/nuego', async (req, res) => {
 
   try {
     // Fetch initial data from the system API
-    const sistemResponse = await axios.get(`https://nue-api.vercel.app/sistem?text=${q}&user=${user}v1`);
+    const sistemResponse = await axios.get(`https://nue-api.vercel.app/sistem?text=${q}&user=${user}v2`);
     const { text, google_search, query_search, image_generator, query_image } = sistemResponse.data;
 
     let hs = '';
