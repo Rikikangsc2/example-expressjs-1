@@ -121,7 +121,7 @@ app.get('/nuego', async (req, res) =>{
   const {user, q} = req.query;
   if (!q && !user) return res.status(400).send('Masukan parameter q dan user');
     try {
-              const sistem = await axios.get(base+'/sistem',{params:{text:q, user:user+'sistemV1'}});
+              const sistem = await axios.get(`https://nue-api.vercel.app/sistem?text=${q}&user=${user}v1`);
             const {text, google_search, query_search} = sistem.data;
         let hs = ''
             if (google_search) {
