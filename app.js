@@ -519,7 +519,7 @@ app.get('/snapsave', async (req, res) => {
     }
 
     let hasil = await scrap.snapsave(req.query.url);
-      res.send(hasil)
+     return res.send(hasil)
     const response = await axios.head(hasil[0].url);
     let type = 'video';
     if (response.headers['content-type'].includes('image')) {
