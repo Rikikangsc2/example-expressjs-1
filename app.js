@@ -163,7 +163,7 @@ app.get('/nuego', async (req, res) => {
         user: user
       }
     });
-      response.data.result = img ? '> ' + urlImg + '\n\n' + response.data.result : response.data.result;
+      response.data.result = response.data.result.replace(/https?:\/\/\S+/g, (url) => url !== urlImg ? '[!url di hapus tidak valid]' : url);
 
     // Structure the final response
     res.status(200).send({
