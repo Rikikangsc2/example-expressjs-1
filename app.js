@@ -511,6 +511,7 @@ app.get('/gpt', async (req, res) => {
 
 app.get('/snapsave', async (req, res) => {
   try {
+    // Check if URL parameter is present
     if (!req.query.url) {
       return res.status(400).json({
         status: 400,
@@ -518,17 +519,33 @@ app.get('/snapsave', async (req, res) => {
       });
     }
 
+    // Scrape data from the provided URL
     let hasil = await scrap.snapsave(req.query.url);
-     return res.send(hasil)
+    if (!hasil.length) {
+      return res.status(404).json({
+        status: 404,
+        message: "No data found for the provided URL"
+      });
+    }
+
+    // Get content type from the first result URL
     const response = await axios.head(hasil[0].url);
-    let type = 'video';
+    let type = 'unknown';
     if (response.headers['content-type'].includes('image')) {
       type = 'image';
     } else if (response.headers['content-type'].includes('video')) {
       type = 'video';
     }
-    const json = {endpoint: base+'/api/snapsave?url='+encodeURIComponent(req.query.url),status: 200,type, result: hasil};
-      res.status(200).json(json);
+
+    // Construct and send the response
+    const json = {
+      endpoint: `${base}/api/snapsave?url=${encodeURIComponent(req.query.url)}`,
+      status: 200,
+      type,
+      result: hasil
+    };
+
+    res.status(200).json(json);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: error.message });
