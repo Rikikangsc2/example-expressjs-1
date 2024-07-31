@@ -176,7 +176,7 @@ app.get('/bard', async (req, res) => {
 
   try {
     const sistemResponse = await axios.get(`https://nue-api.vercel.app/sistem?text=${text}&user=bard`);
-    const { text, google_search, query_search } = sistemResponse.data;
+    const { google_search, query_search } = sistemResponse.data;
 
     const fetchGoogleSearchResults = async () => {
       try {
