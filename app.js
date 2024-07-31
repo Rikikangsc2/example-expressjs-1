@@ -269,7 +269,7 @@ app.get('/sdxl', async (req, res) => {
     return res.status(400).send('Prompt parameter is required');
   }
   if (!model) {
-    res.status(500).json({ error: 'Model parameter is required' })
+    return res.status(500).json({ error: 'Model parameter is required' });
   }
 
   try {
@@ -281,16 +281,17 @@ app.get('/sdxl', async (req, res) => {
         'content-type': 'application/json',
         'X-Prodia-Key': apikey()
       },
-        data: {width: 1024,
-    height: 1024,
-    sampler: 'DPM++ 2M Karras',
-    upscale: true,
-    seed: -1,
-    cfg_scale: 7,
-    steps: 20,
-    model: model,
-    prompt: prompt}
-
+      data: {
+        width: 1024,
+        height: 1024,
+        sampler: 'DPM++ 2M Karras',
+        upscale: true,
+        seed: -1,
+        cfg_scale: 7,
+        steps: 20,
+        model: model,
+        prompt: prompt
+      }
     };
 
     const apiResponse = await axios(options);
@@ -314,18 +315,19 @@ app.get('/sdxl', async (req, res) => {
       status = data2.status;
 
       if (status !== 'succeeded') {
-        console.log(`Current status: ${status}. Waiting for 10 seconds...`);
-        await new Promise(resolve => setTimeout(resolve, 10000));
+        console.log(`Current status: ${status}. Waiting for 2 seconds...`);
+        await new Promise(resolve => setTimeout(resolve, 2000));
       }
     }
 
     const json = { endpoint: `${base}/api/sdxl?model=${model}&prompt=${encodeURIComponent(prompt)}`, data: data2 };
-  res.status(200).json(json);
+    res.status(200).json(json);
   } catch (error) {
     console.error(error);
-      res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 });
+
 app.get('/text2img', async (req, res) => {
   const model = req.query.model;
   const prompt = req.query.prompt;
@@ -333,7 +335,7 @@ app.get('/text2img', async (req, res) => {
     return res.status(400).send('Prompt parameter is required');
   }
   if (!model) {
-    res.status(500).json({ error: 'Model parameter is required' });
+    return res.status(500).json({ error: 'Model parameter is required' });
   }
 
   try {
@@ -345,15 +347,17 @@ app.get('/text2img', async (req, res) => {
         'content-type': 'application/json',
         'X-Prodia-Key': apikey()
       },
-        data: {width: 1024,
-    height: 1024,
-    sampler: 'DPM++ 2M Karras',
-    upscale: true,
-    seed: -1,
-    cfg_scale: 7,
-    steps: 20,
-    model: model,
-    prompt: prompt}
+      data: {
+        width: 1024,
+        height: 1024,
+        sampler: 'DPM++ 2M Karras',
+        upscale: true,
+        seed: -1,
+        cfg_scale: 7,
+        steps: 20,
+        model: model,
+        prompt: prompt
+      }
     };
 
     const apiResponse = await axios(options);
@@ -377,8 +381,8 @@ app.get('/text2img', async (req, res) => {
       status = data2.status;
 
       if (status !== 'succeeded') {
-        console.log(`Current status: ${status}. Waiting for 10 seconds...`);
-        await new Promise(resolve => setTimeout(resolve, 10000));
+        console.log(`Current status: ${status}. Waiting for 2 seconds...`);
+        await new Promise(resolve => setTimeout(resolve, 2000));
       }
     }
 
@@ -386,9 +390,10 @@ app.get('/text2img', async (req, res) => {
     res.status(200).json(json);
   } catch (error) {
     console.error(error);
-      res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 });
+
 app.get('/upscale', async (req, res) => {
   const link = req.query.url;
   if (!link) {
@@ -396,7 +401,6 @@ app.get('/upscale', async (req, res) => {
   }
 
   try {
-    // Mengunduh gambar dari URl
     const response = await axios.get(link, { responseType: 'arraybuffer' });
     fs.writeFileSync('hasil.jpeg', response.data);
     const imageData = await axios.get(`https://nue-api.koyeb.app/hasil.jpeg`, { responseType: 'arraybuffer' });
@@ -437,8 +441,8 @@ app.get('/upscale', async (req, res) => {
       status = data2.status;
 
       if (status !== 'succeeded') {
-        console.log(`Current status: ${status}. Waiting for 10 seconds...`);
-        await new Promise(resolve => setTimeout(resolve, 10000));
+        console.log(`Current status: ${status}. Waiting for 2 seconds...`);
+        await new Promise(resolve => setTimeout(resolve, 2000));
       }
     }
 
@@ -446,7 +450,7 @@ app.get('/upscale', async (req, res) => {
     res.status(200).json(json);
   } catch (error) {
     console.error(error);
-      res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 });
 
