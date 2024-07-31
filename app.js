@@ -118,8 +118,8 @@ if (key === 'purpur') return next();
 });
 //Router
 app.get('/nuego', async (req, res) => {
-  const versionAI = '1.0.1'
-  const versionSistem = '1.0.0.1'
+  const versionAI = '1.0.2'
+  const versionSistem = '1.0.0.2'
   const { user, q } = req.query;
 
   if (!q || !user) {
@@ -139,18 +139,9 @@ app.get('/nuego', async (req, res) => {
       }
     };
 
-    const fetchImageGeneratorResult = async () => {
-      try {
-        const { data } = await axios.get(`https://nue-api.vercel.app/api/text2img?model=breakdomain_M2150.safetensors [15f7afca]&prompt=${query_image}`);
-        return data.data.imageUrl;
-      } catch {
-        return 'Tidak dapat mengambil gambar';
-      }
-    };
-
     const [hs, urlImg] = await Promise.all([
       google_search ? fetchGoogleSearchResults() : null,
-      image_generator && query_image ? fetchImageGeneratorResult() : null
+      image_generator && query_image ? `https://nue-api.vercel.app/api/text2img?model=breakdomain_M2150.safetensors [15f7afca]&prompt=${encodeURIComponent(query_image)}` : null
     ]);
 
     const aiMessage = `*memproses permintaan*
@@ -171,7 +162,9 @@ Anda harus menulis jawabannya untuk pengguna`;
 
     res.status(200).send({
       endpoint: `${req.baseUrl}/api/nuego?q=${q}&user=${user}`,
-      system: sistemResponse.data,
+      google: google_search,
+      prodia: image_generator,
+      imageUrl: urlImg,
       result: response.data.result,
       history: response.data.history
     });
