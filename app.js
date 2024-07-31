@@ -118,8 +118,8 @@ if (key === 'purpur') return next();
 });
 //Router
 app.get('/nuego', async (req, res) => {
-  const versionAI = '1.0.4'
-  const versionSistem = '1.0.0.4'
+  const versionAI = '1.0.5'
+  const versionSistem = '1.0.0.5'
   const { user, q } = req.query;
 
   if (!q || !user) {
@@ -301,8 +301,8 @@ app.get('/sdxl', async (req, res) => {
       status = data2.status;
 
       if (status !== 'succeeded') {
-        console.log(`Current status: ${status}. Waiting for 2 seconds...`);
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        console.log(`Current status: ${status}. Waiting for 10 seconds...`);
+        await new Promise(resolve => setTimeout(resolve, 10000));
       }
     }
 
@@ -367,8 +367,8 @@ app.get('/text2img', async (req, res) => {
       status = data2.status;
 
       if (status !== 'succeeded') {
-        console.log(`Current status: ${status}. Waiting for 2 seconds...`);
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        console.log(`Current status: ${status}. Waiting for 10 seconds...`);
+        await new Promise(resolve => setTimeout(resolve, 10000));
       }
     }
 
@@ -427,8 +427,8 @@ app.get('/upscale', async (req, res) => {
       status = data2.status;
 
       if (status !== 'succeeded') {
-        console.log(`Current status: ${status}. Waiting for 2 seconds...`);
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        console.log(`Current status: ${status}. Waiting for 10 seconds...`);
+        await new Promise(resolve => setTimeout(resolve, 10000));
       }
     }
 
