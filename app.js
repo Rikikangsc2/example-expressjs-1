@@ -118,8 +118,8 @@ if (key === 'purpur') return next();
 });
 //Router
 app.get('/nuego', async (req, res) => {
-  const versionAI = '1.0.0'
-  const versionSistem = '1.0.0.0'
+  const versionAI = '1.0.1'
+  const versionSistem = '1.0.0.1'
   const { user, q } = req.query;
 
   if (!q || !user) {
@@ -154,9 +154,9 @@ app.get('/nuego', async (req, res) => {
     ]);
 
     const aiMessage = `*memproses permintaan*
-${hs ? 'Hasil dari Google: ' + hs : ''}${urlImg ? '\nHasil dari Pembuatan gambar: ' + urlImg : ''}
+${hs ? 'Berhasil melakukan pencarian google, berikut hasilnya untuk membantu dalam menjawab pertanyaan pengguna: ' + hs : ''}${urlImg ? '\nBerhasil melakukan pembuatan gambar, berikut link downloadnya untuk di serahkan kepada pengguna: ' + urlImg : ''}
 
-Menulis jawaban...`;
+Anda harus menulis jawabannya untuk pengguna`;
 
     const response = await axios.get('https://nue-api.vercel.app/api/lgpt', {
       params: {
