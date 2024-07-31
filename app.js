@@ -118,6 +118,8 @@ if (key === 'purpur') return next();
 });
 //Router
 app.get('/nuego', async (req, res) => {
+  const versionAI = '1.0.0'
+  const versionSistem = '1.0.0.0'
   const { user, q } = req.query;
 
   if (!q || !user) {
@@ -125,7 +127,7 @@ app.get('/nuego', async (req, res) => {
   }
 
   try {
-    const sistemResponse = await axios.get(`https://nue-api.vercel.app/sistem?text=${q}&user=${user}v3`);
+    const sistemResponse = await axios.get(`https://nue-api.vercel.app/sistem?text=${q}&user=${user}${versionSistem}`);
     const { text, google_search, query_search, image_generator, query_image } = sistemResponse.data;
 
     const fetchGoogleSearchResults = async () => {
@@ -151,19 +153,21 @@ app.get('/nuego', async (req, res) => {
       image_generator && query_image ? fetchImageGeneratorResult() : null
     ]);
 
+    const aiMessage = `*memproses permintaan*
+${hs ? 'Hasil dari Google: ' + hs : ''}${urlImg ? '\nHasil dari Pembuatan gambar: ' + urlImg : ''}
+
+Menulis jawaban...`;
+
     const response = await axios.get('https://nue-api.vercel.app/api/lgpt', {
       params: {
         text: text,
         systemPrompt: `Anda adalah AI bernama nueGo anda adalah AI lanjutan buatan NueAPI dan memiliki API di nue-api.vercel.app, Anda dapat mencari informasi dan membuat gambar anda di lengkapi dengan pengetahuan real-time dan sudah terintegrasi dengan google search dan image generator`,
-        aiMessage: `*memproses permintaan*
-${hs ? 'Hasil dari Google: ' + hs : ''}${urlImg ? '\nHasil dari Pembuatan gambar: ' + urlImg : ''}
-
-Menulis jawaban...`,
-        user: `${user}v1`
+        aiMessage: aiMessage,
+        user: `${user}${versionAI}`
       }
     });
 
-    response.data.result = response.data.result.replace(/https?:\/\/\S+/g, match => (match !== urlImg ? '[!Url di hapus tidak valid]' : urlImg));
+      response.data.result = response.data.result.replace(/https?:\/\/\S+/g, match => (urlImg && match !== urlImg ? urlImg : (urlImg ? urlImg : '[!Url di hapus tidak valid]')));
 
     res.status(200).send({
       endpoint: `${req.baseUrl}/api/nuego?q=${q}&user=${user}`,
