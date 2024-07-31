@@ -118,8 +118,8 @@ if (key === 'purpur') return next();
 });
 //Router
 app.get('/nuego', async (req, res) => {
-  const versionAI = '1.0.2'
-  const versionSistem = '1.0.0.2'
+  const versionAI = '1.0.4'
+  const versionSistem = '1.0.0.4'
   const { user, q } = req.query;
 
   if (!q || !user) {
