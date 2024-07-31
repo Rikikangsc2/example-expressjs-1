@@ -120,53 +120,53 @@ if (key === 'purpur') return next();
 app.get('/nuego', async (req, res) => {
   const { user, q } = req.query;
 
-  // Improved parameter validation
   if (!q || !user) {
     return res.status(400).send('Masukkan parameter q dan user');
   }
 
   try {
-    // Fetch initial data from the system API
     const sistemResponse = await axios.get(`https://nue-api.vercel.app/sistem?text=${q}&user=${user}v3`);
     const { text, google_search, query_search, image_generator, query_image } = sistemResponse.data;
 
-    let hs = 'Ajukan permintaan!';
-    let urlImg = 'ajukan permintaan!';
-
-    // Handle Google search results
-    if (google_search) {
+    const fetchGoogleSearchResults = async () => {
       try {
-        const hasilResponse = await axios.get(`https://nue-api.vercel.app/api/google?limit=5&query=${query_search}`);
-        hs = hasilResponse.data.map(item => `${item.title}, ${item.snippet}, ${item.link}`).join('\n');
-      } catch (error) {
-        hs = 'Tidak dapat mengambil hasil dari Google';
+        const { data } = await axios.get(`https://nue-api.vercel.app/api/google?limit=5&query=${query_search}`);
+        return data.map(item => `${item.title}, ${item.snippet}, ${item.link}`).join('\n');
+      } catch {
+        return 'Tidak dapat mengambil hasil dari Google';
       }
-    }
+    };
 
-    // Handle image generation
-    if (image_generator && query_image) {
+    const fetchImageGeneratorResult = async () => {
       try {
-        const hasilResponse = await axios.get(`https://nue-api.vercel.app/api/text2img?model=breakdomain_M2150.safetensors [15f7afca]&prompt=${query_image}`);
-        urlImg = hasilResponse.data.data.imageUrl;
-      } catch (error) {
-        urlImg = 'Tidak dapat mengambil gambar';
+        const { data } = await axios.get(`https://nue-api.vercel.app/api/text2img?model=breakdomain_M2150.safetensors [15f7afca]&prompt=${query_image}`);
+        return data.data.imageUrl;
+      } catch {
+        return 'Tidak dapat mengambil gambar';
       }
-    }
+    };
 
-    // Fetch final response from the language model API
+    const [hs, urlImg] = await Promise.all([
+      google_search ? fetchGoogleSearchResults() : null,
+      image_generator && query_image ? fetchImageGeneratorResult() : null
+    ]);
+
     const response = await axios.get('https://nue-api.vercel.app/api/lgpt', {
       params: {
         text: text,
-        systemPrompt: `Anda adalah AI bernama nuego anda adalah AI dengan pengetahuan real-time dan sudah terintegrasi dengan google dan image generator`,
-        aiMessage: `\nGoogle-result: ${hs}\nimg-generator-result: ${urlImg}\n\nAda yang bisa aku bantu?☺️`,
-        user: user+'v1'
+        systemPrompt: `Anda adalah AI bernama nueGo anda adalah AI lanjutan buatan NueAPI dan memiliki API di nue-api.vercel.app, Anda dapat mencari informasi dan membuat gambar anda di lengkapi dengan pengetahuan real-time dan sudah terintegrasi dengan google search dan image generator`,
+        aiMessage: `*memproses permintaan*
+${hs ? 'Hasil dari Google: ' + hs : ''}${urlImg ? '\nHasil dari Pembuatan gambar: ' + urlImg : ''}
+
+Menulis jawaban...`,
+        user: `${user}v1`
       }
     });
-      response.data.result = response.data.result.replace(/https?:\/\/\S+/g, match => (match !== urlImg ? (urlImg.match(/https?:\/\/\S+/) ? urlImg : "[!Url di hapus tidak valid]") : urlImg));
 
-    // Structure the final response
+    response.data.result = response.data.result.replace(/https?:\/\/\S+/g, match => (match !== urlImg ? '[!Url di hapus tidak valid]' : urlImg));
+
     res.status(200).send({
-      endpoint: `${base}/api/nuego?q=${q}&user=${user}`,
+      endpoint: `${req.baseUrl}/api/nuego?q=${q}&user=${user}`,
       system: sistemResponse.data,
       result: response.data.result,
       history: response.data.history
