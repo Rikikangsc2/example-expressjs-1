@@ -128,7 +128,7 @@ app.get('/nuego', async (req, res) => {
 
   try {
     const sistemResponse = await axios.get(`https://nue-api.vercel.app/sistem?text=${q}&user=${user}${versionSistem}`);
-    const { text, google_search, query_search, image_generator, query_image } = sistemResponse.data;
+    const { text, google_search, query_search } = sistemResponse.data;
 
     const fetchGoogleSearchResults = async () => {
       try {
@@ -138,40 +138,26 @@ app.get('/nuego', async (req, res) => {
         return 'Tidak dapat mengambil hasil dari Google';
       }
     };
-const fetchImageGeneratorResult = async () => {
-      try {
-        const { data } = await axios.get(`https://nue-api.vercel.app/api/text2img?model=breakdomain_M2150.safetensors [15f7afca]&prompt=${query_image}`);
-        return data.data.imageUrl;
-      } catch {
-        return 'Tidak dapat mengambil gambar';
-      }
-    };
-    const [hs, urlImg] = await Promise.all([
-      google_search ? fetchGoogleSearchResults() : null,
-      image_generator && query_image ? fetchImageGeneratorResult() : null
-    ]);
+
+    const hs = google_search ? await fetchGoogleSearchResults() : null;
 
     const aiMessage = `*memproses permintaan*
-${hs ? 'Berhasil melakukan pencarian google, berikut hasilnya untuk membantu dalam menjawab pertanyaan pengguna: ' + hs : ''}${urlImg ? '\nBerhasil melakukan pembuatan gambar, berikut link downloadnya untuk di serahkan kepada pengguna: ' + urlImg : ''}
+${hs ? 'Berhasil melakukan pencarian google, berikut hasilnya untuk membantu dalam menjawab pertanyaan pengguna: ' + hs : ''}
 
 Anda harus menulis jawabannya untuk pengguna`;
 
     const response = await axios.get('https://nue-api.vercel.app/api/lgpt', {
       params: {
         text: text,
-        systemPrompt: `Anda adalah AI bernama nueGo anda adalah AI lanjutan buatan NueAPI dan memiliki API di nue-api.vercel.app, Anda dapat mencari informasi dan membuat gambar anda di lengkapi dengan pengetahuan real-time dan sudah terintegrasi dengan google search dan image generator`,
+        systemPrompt: `Anda adalah AI bernama nueGo anda adalah AI lanjutan buatan NueAPI dan memiliki API di nue-api.vercel.app, Anda dapat mencari informasi dan sudah terintegrasi dengan google search`,
         aiMessage: aiMessage,
         user: `${user}${versionAI}`
       }
     });
 
-      response.data.result = response.data.result.replace(/https?:\/\/\S+/g, match => (urlImg && match !== urlImg ? urlImg : (urlImg ? urlImg : '[!Url di hapus tidak valid]')));
-
     res.status(200).send({
       endpoint: `${req.baseUrl}/api/nuego?q=${q}&user=${user}`,
       google: google_search,
-      prodia: image_generator,
-      imageUrl: urlImg,
       result: response.data.result,
       history: response.data.history
     });
