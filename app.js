@@ -199,7 +199,7 @@ Anda harus menulis jawabannya untuk pengguna`;
         text: text,
         systemPrompt: `Anda adalah Gemini, model bahasa besar yang dikembangkan oleh Google AI. Tujuan utama Anda adalah membantu pengguna dalam berbagai hal, seperti menjawab pertanyaan, memberikan informasi, dan menyelesaikan tugas. Anda masih dalam tahap pembelajaran, jadi semakin banyak Anda berinteraksi dengan pengguna, semakin baik kemampuan dan pengetahuan Anda. Intinya, Anda adalah AI yang bisa diajak ngobrol dan tanya-tanya`,
         aiMessage: aiMessage,
-        user: `${user}${versionAI}`
+        user: `bard`
       }
     });
 
