@@ -146,7 +146,7 @@ app.get('/bard', async (req, res) => {
     const aiMessage = `*memproses permintaan*
 ${hs ? 'Berhasil melakukan pencarian google, berikut hasilnya untuk membantu dalam menjawab pertanyaan pengguna: ' + hs : ''}
 
-Anda harus menulis jawabannya untuk pengguna di sertai dengan penjelasan yang lengkap`;
+Anda harus menulis jawabannya untuk pengguna di sertai dengan penjelasan yang lengkap dan panjang`;
 
     const chatCompletion = await groq.chat.completions.create({
       messages: [
