@@ -143,7 +143,7 @@ app.get('/bard', async (req, res) => {
 
     const hs = google_search ? await fetchGoogleSearchResults() : null;
 
-    const aiMessage = `*memproses permintaan*
+    const aiMessage = `*Gemini AI sedang memproses permintaan*
 ${hs ? 'Berhasil melakukan pencarian google, berikut hasilnya untuk membantu dalam menjawab pertanyaan pengguna: ' + hs : 'Google search tifak di aktifkan untuk pertanyaan ini'}
 
 Anda harus menulis jawabannya untuk pengguna di sertai dengan penjelasan yang lengkap dan panjang`;
