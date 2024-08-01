@@ -11,7 +11,11 @@ const gis = require('g-i-s');
 const bodyParser = require('body-parser');
 const { exec } = require('child_process');
 const { RsnChat } = require("rsnchat");
+const Groq = require('groq-sdk');
 
+const key = ['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','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','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','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']
+const randomKey = key[Math.floor(Math.random() * key.length)];
+const groq = new Groq({ apiKey: randomKey });
 const rsnchat = new RsnChat("rsnai_SQPKHQEtlKlh8s9cjovGIiOp");
 
 const userId = 'nueapi'; 
@@ -117,6 +121,65 @@ if (key === 'purpur') return next();
   }
 });
 //Router
+app.get('/bard', async (req, res) => {
+  const { text } = req.query;
+
+  if (!text) {
+    return res.status(400).send('Masukkan parameter text');
+  }
+
+  try {
+    const sistemResponse = await axios.get(`https://nue-api.vercel.app/sistem?text=${text}&user=bardo`);
+    const { google_search, query_search } = sistemResponse.data;
+
+    const fetchGoogleSearchResults = async () => {
+      try {
+        const { data } = await axios.get(`https://nue-api.vercel.app/api/google?limit=5&query=${query_search}`);
+        return data.map(item => `${item.title}, ${item.snippet}, ${item.link}`).join('\n');
+      } catch {
+        return 'Tidak dapat mengambil hasil dari Google';
+      }
+    };
+
+    const hs = google_search ? await fetchGoogleSearchResults() : null;
+
+    const aiMessage = `*memproses permintaan*
+${hs ? 'Berhasil melakukan pencarian google, berikut hasilnya untuk membantu dalam menjawab pertanyaan pengguna: ' + hs : ''}
+
+Anda harus menulis jawabannya untuk pengguna`;
+
+    const chatCompletion = await groq.chat.completions.create({
+      messages: [
+        {
+          role: "system",
+          content: "Anda adalah Gemini, model bahasa besar yang dikembangkan oleh Google AI. Tujuan utama Anda adalah membantu pengguna dalam berbagai hal, seperti menjawab pertanyaan, memberikan informasi, dan menyelesaikan tugas. Anda masih dalam tahap pembelajaran, jadi semakin banyak Anda berinteraksi dengan pengguna, semakin baik kemampuan dan pengetahuan Anda. Intinya, Anda adalah AI yang bisa diajak ngobrol dan tanya-tanya. Anda dapat mencari informasi dan sudah terintegrasi dengan google search"
+        },
+        {
+          role: "user",
+          content: text
+        },
+        {
+          role: "system",
+          content: aiMessage
+        }
+      ],
+      model: "gemma2-9b-it",
+      temperature: 1,
+      max_tokens: 1024,
+      top_p: 1,
+      stream: false,
+      stop: null
+    });
+
+    res.status(200).send({
+      endpoint: `${base}/api/bard?text=${text}`,
+      result: chatCompletion.choices[0].message.content
+    });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
 app.get('/nuego', async (req, res) => {
   const versionAI = '1.0.5'
   const versionSistem = '1.0.0.5'
@@ -160,52 +223,6 @@ Anda harus menulis jawabannya untuk pengguna`;
       google: google_search,
       result: response.data.result,
       history: response.data.history
-    });
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.get('/bard', async (req, res) => {
-  const { text } = req.query;
-
-  if (!text) {
-    return res.status(400).send('Masukkan parameter text');
-  }
-
-  try {
-    const sistemResponse = await axios.get(`https://nue-api.vercel.app/sistem?text=${text}&user=bardo`);
-    const { google_search, query_search } = sistemResponse.data;
-
-    const fetchGoogleSearchResults = async () => {
-      try {
-        const { data } = await axios.get(`https://nue-api.vercel.app/api/google?limit=5&query=${query_search}`);
-        return data.map(item => `${item.title}, ${item.snippet}, ${item.link}`).join('\n');
-      } catch {
-        return 'Tidak dapat mengambil hasil dari Google';
-      }
-    };
-
-    const hs = google_search ? await fetchGoogleSearchResults() : null;
-
-    const aiMessage = `*memproses permintaan*
-${hs ? 'Berhasil melakukan pencarian google, berikut hasilnya untuk membantu dalam menjawab pertanyaan pengguna: ' + hs : ''}
-
-Anda harus menulis jawabannya untuk pengguna`;
-
-    const response = await axios.get('https://nue-api.vercel.app/api/lgpt', {
-      params: {
-        text: text,
-        systemPrompt: `Anda adalah Gemini, model bahasa besar yang dikembangkan oleh Google AI. Tujuan utama Anda adalah membantu pengguna dalam berbagai hal, seperti menjawab pertanyaan, memberikan informasi, dan menyelesaikan tugas. Anda masih dalam tahap pembelajaran, jadi semakin banyak Anda berinteraksi dengan pengguna, semakin baik kemampuan dan pengetahuan Anda. Intinya, Anda adalah AI yang bisa diajak ngobrol dan tanya-tanya. Anda dapat mencari informasi dan sudah terintegrasi dengan google search`,
-        aiMessage: aiMessage,
-        user: `bardul`
-      }
-    });
-
-    res.status(200).send({
-      endpoint: `${base}/api/bard?text=${text}`,
-      result: response.data.result
     });
   } catch (error) {
     console.error('Error:', error);
