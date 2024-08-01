@@ -206,7 +206,7 @@ Semoga outline ini membantumu ya!`
 
     res.status(200).send({
       endpoint: `${base}/api/bard?text=${text}`,
-      result: chatCompletion.choices[0].message.content
+      result: chatCompletion.choices[0].message.content.trim()
     });
   } catch (error) {
     console.error('Error:', error);
