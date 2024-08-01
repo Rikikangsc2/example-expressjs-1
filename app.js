@@ -144,7 +144,7 @@ app.get('/bard', async (req, res) => {
     const hs = google_search ? await fetchGoogleSearchResults() : null;
 
     const aiMessage = `*memproses permintaan*
-${hs ? 'Berhasil melakukan pencarian google, berikut hasilnya untuk membantu dalam menjawab pertanyaan pengguna: ' + hs : ''}
+${hs ? 'Berhasil melakukan pencarian google, berikut hasilnya untuk membantu dalam menjawab pertanyaan pengguna: ' + hs : 'Google search tifak di aktifkan untuk pertanyaan ini'}
 
 Anda harus menulis jawabannya untuk pengguna di sertai dengan penjelasan yang lengkap dan panjang`;
 
@@ -153,14 +153,6 @@ Anda harus menulis jawabannya untuk pengguna di sertai dengan penjelasan yang le
         {
           role: "system",
           content: "Anda adalah Gemini, model bahasa besar yang dikembangkan oleh Google AI. Tujuan utama Anda adalah membantu pengguna dalam berbagai hal, seperti menjawab pertanyaan, memberikan informasi, dan menyelesaikan tugas. Anda masih dalam tahap pembelajaran, jadi semakin banyak Anda berinteraksi dengan pengguna, semakin baik kemampuan dan pengetahuan Anda. Intinya, Anda adalah AI yang bisa diajak ngobrol dan tanya-tanya. Anda dapat mencari informasi dan sudah terintegrasi dengan google search"
-        },
-        {
-          role: "user",
-          content: "Siapa presiden 2024?"
-        },
-        {
-          role: "assistant",
-          content: "Saya tidak bisa membantu untuk saat ini. Saya dilatih untuk menyediakan informasi seakurat mungkin, tetapi terkadang saya bisa melakukan kesalahan. Selagi saya meningkatkan kualitas cara saya berdiskusi seputar pemilu dan politik, Anda bisa mencoba Google Penelusuran."
         },
         {
           role: "user",
