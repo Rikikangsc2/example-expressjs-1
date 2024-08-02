@@ -254,7 +254,7 @@ Anda harus menulis jawabannya untuk pengguna`;
     res.status(200).send({
       endpoint: `${base}/api/nuego?q=${q}&user=${user}`,
       google: google_search,
-      result: response.data.result,
+      result: query_search? `> ${query_search}\n${response.data.result}`:response.data.result,
       history: response.data.history
     });
   } catch (error) {
