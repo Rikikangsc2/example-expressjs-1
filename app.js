@@ -19,7 +19,7 @@ const groq = new Groq({ apiKey: randomKey });
 const rsnchat = new RsnChat("rsnai_SQPKHQEtlKlh8s9cjovGIiOp");
 
 const userId = 'nueapi'; 
-const ikyDBBaseUrl = 'https://copper-ambiguous-velvet.glitch.me';
+const ikyDBBaseUrl = 'https://nue-db.vercel.app';
 
 const listapikey = ["8f62a0ea-cd83-4003-b809-6803bf9dd619","09c4a774-bf77-474a-b09b-45d63005160b","7e8ee357-c24c-450e-993b-ecc7458a6607","91eb053f-ae98-4baa-a2b0-1585f6199979","17a57da9-df4a-48c2-8d49-5bfc390174d2","6dc6600b-893a-4550-a980-a12c5f015288","4a465c34-f761-4de3-a9f8-b791ac7c5f43","cccdaf86-5e20-4b02-90cf-0e2dfa2ae19f"]
 
@@ -31,7 +31,10 @@ const apikey = () => {
 async function readData() {
   try {
     const response = await axios.get(`${ikyDBBaseUrl}/read/${userId}`);
-    return response.data;
+    return response.data || {today: 0,
+        yesterday: 0,
+        total: 0,
+        lastDate: new Date().getDate()};
   } catch (error) {
     if (error.response && error.response.status === 404) {
       return {
