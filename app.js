@@ -12,6 +12,8 @@ const bodyParser = require('body-parser');
 const { exec } = require('child_process');
 const { RsnChat } = require("rsnchat");
 const Groq = require('groq-sdk');
+const request = require('request');
+const { ytmp4, ytmp3v2 } = require('ruhend-scraper')
 
 const key = ['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','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','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','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']
 const randomKey = key[Math.floor(Math.random() * key.length)];
@@ -124,6 +126,49 @@ if (key === 'purpur') return next();
   }
 });
 //Router
+app.get('/yt-mp3', async (req, res) => {
+  const url = req.query.url;
+  if (!url) {
+    return res.status(400).json({ error: 'URL parameter is required' });
+  }
+
+  try {
+    const info = await ytmp3v2(url);
+    const audioUrl = info.audio;
+
+    request({ url: audioUrl, encoding: null }, (err, response, body) => {
+      if (err) {
+        return res.status(500).json({ error: 'Error fetching audio stream' });
+      }
+      res.setHeader('Content-Type', 'audio/mpeg');
+      res.send(body);
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching audio information' });
+  }
+});
+
+app.get('/yt-mp4', async (req, res) => {
+  const url = req.query.url;
+  if (!url) {
+    return res.status(400).json({ error: 'URL parameter is required' });
+  }
+
+  try {
+    const info2 = await ytmp4(url);
+    const videoUrl = info2.video;
+
+    request({ url: videoUrl, encoding: null }, (err, response, body) => {
+      if (err) {
+        return res.status(500).json({ error: 'Error fetching video stream' });
+      }
+      res.setHeader('Content-Type', 'video/mp4');
+      res.send(body);
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching video information' });
+  }
+});
 app.get('/bard', async (req, res) => {
   const { text } = req.query;
 
