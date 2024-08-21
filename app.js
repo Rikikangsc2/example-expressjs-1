@@ -13,7 +13,7 @@ const { exec } = require('child_process');
 const { RsnChat } = require("rsnchat");
 const Groq = require('groq-sdk');
 const request = require('request');
-const { ytmp4, ytmp3v2 } = require('ruhend-scraper')
+const { ytmp4, ytmp3v2 } = require('bangriq')
 
 const key = ['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','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','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','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']
 const randomKey = key[Math.floor(Math.random() * key.length)];
