@@ -104,28 +104,6 @@ app.use('/hasil.jpeg', express.static(path.join(__dirname, 'hasil.jpeg')));
 app.get('/sdlist',async(req,res)=>{await sdList(res)})
 app.get('/sdxllist',async(req,res)=>{await sdxlList(res)})
 
-app.use(async (req, res, next) => {
-  const { key } = req.query;
-  if (!key) {
-    return res.status(400).json({ error: 'Key is required' });
-  }
-if (key === 'purpur') return next();
-  try {
-    const response = await axios.get('https://nue-api.vercel.app/key');
-    const validKeys = response.data;
-
-    const isValidKey = validKeys.some(validKey => validKey === key);
-
-    if (isValidKey) {
-      return next();
-    } else {
-      return res.status(401).json({ error: 'Silahkan gunakan endpoint utama karna key akan berubah ubah' });
-    }
-  } catch (error) {
-    return res.status(500).json({ error: 'Ada kesalahan pada server kami' });
-  }
-});
-//Router
 app.get('/yt-mp3', async (req, res) => {
   const url = req.query.url;
   if (!url) {
@@ -169,6 +147,29 @@ app.get('/yt-mp4', async (req, res) => {
     res.status(500).json({ error: 'Error fetching video information' });
   }
 });
+
+app.use(async (req, res, next) => {
+  const { key } = req.query;
+  if (!key) {
+    return res.status(400).json({ error: 'Key is required' });
+  }
+if (key === 'purpur') return next();
+  try {
+    const response = await axios.get('https://nue-api.vercel.app/key');
+    const validKeys = response.data;
+
+    const isValidKey = validKeys.some(validKey => validKey === key);
+
+    if (isValidKey) {
+      return next();
+    } else {
+      return res.status(401).json({ error: 'Silahkan gunakan endpoint utama karna key akan berubah ubah' });
+    }
+  } catch (error) {
+    return res.status(500).json({ error: 'Ada kesalahan pada server kami' });
+  }
+});
+//Router
 app.get('/bard', async (req, res) => {
   const { text } = req.query;
 
