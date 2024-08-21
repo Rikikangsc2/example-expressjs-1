@@ -112,7 +112,6 @@ app.get('/yt-mp3', async (req, res) => {
 
   try {
     const info = await ytmp3v3(url);
-    return res.json(info);
     const audioUrl = info.audio;
 
     request({ url: audioUrl, encoding: null }, (err, response, body) => {
@@ -135,7 +134,6 @@ app.get('/yt-mp4', async (req, res) => {
 
   try {
     const info2 = await ytmp4v4(url);
-    return res.json(info2);
     const videoUrl = info2.video;
 
     request({ url: videoUrl, encoding: null }, (err, response, body) => {
