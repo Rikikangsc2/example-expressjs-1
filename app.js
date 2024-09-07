@@ -15,7 +15,7 @@ const Groq = require('groq-sdk');
 const request = require('request');
 const { ytmp4v4, ytmp3v3 } = require('bangriq')
 
-const key = ['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','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','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','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']
+const key = ['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']
 const randomKey = key[Math.floor(Math.random() * key.length)];
 const groq = new Groq({ apiKey: randomKey });
 const rsnchat = new RsnChat("rsnai_SQPKHQEtlKlh8s9cjovGIiOp");
