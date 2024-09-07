@@ -262,53 +262,89 @@ Semoga outline ini membantumu ya!`
     res.status(500).json({ error: error.message });
   }
 });
+
 app.get('/nuego', async (req, res) => {
-  const versionAI = '1.0.5'
-  const versionSistem = '1.0.0.5'
+  const versionAI = '1.0.5';
+  const versionSistem = '1.0.0.5';
   const { user, q } = req.query;
 
+  // Cek apakah parameter q dan user ada
   if (!q || !user) {
     return res.status(400).send('Masukkan parameter q dan user');
   }
 
   try {
-    const sistemResponse = await axios.get(`https://nue-api.vercel.app/sistem?text=${q}&user=${user}${versionSistem}`);
+    // Try block pertama untuk menangkap error dari permintaan sistem
+    let sistemResponse;
+    try {
+      sistemResponse = await axios.get(`https://nue-api.vercel.app/sistem?text=${q}&user=${user}${versionSistem}`);
+    } catch (error) {
+      console.error('Error mengambil data dari sistem:', error.message);
+      return res.status(500).send('Gagal mengambil respon dari sistem. Coba lagi nanti.');
+    }
+
     const { text, google_search, query_search } = sistemResponse.data;
 
+    // Fungsi untuk mengambil hasil Google Search
     const fetchGoogleSearchResults = async () => {
       try {
         const { data } = await axios.get(`https://nue-api.vercel.app/api/google?limit=5&query=${query_search}`);
         return data.map(item => `${item.title}, ${item.snippet}, ${item.link}`).join('\n');
-      } catch {
+      } catch (error) {
+        console.error('Error Google Search:', error.message);
         return 'Tidak dapat mengambil hasil dari Google';
       }
     };
 
-    const hs = google_search ? await fetchGoogleSearchResults() : null;
+    // Jika google_search true, ambil hasil pencarian Google
+    let hs = null;
+    if (google_search) {
+      try {
+        hs = await fetchGoogleSearchResults();
+      } catch (error) {
+        console.error('Error fetching Google Search results:', error.message);
+        hs = 'Tidak dapat mengambil hasil dari Google';
+      }
+    }
 
+    // Pesan yang akan dikirimkan ke sistem AI
     const aiMessage = `*memproses permintaan*
 ${hs ? 'Berhasil melakukan pencarian google, berikut hasilnya untuk membantu dalam menjawab pertanyaan pengguna: ' + hs : ''}
 
 Anda harus menulis jawabannya untuk pengguna`;
 
-    const response = await axios.get('https://nue-api.vercel.app/api/lgpt', {
-      params: {
-        text: text,
-        systemPrompt: `Anda adalah AI bernama nueGo anda adalah AI lanjutan buatan NueAPI dan memiliki API di nue-api.vercel.app, Anda dapat mencari informasi dan sudah terintegrasi dengan google search`,
-        aiMessage: aiMessage,
-        user: `${user}${versionAI}`
-      }
+    // Try block kedua untuk menangkap error dari API lgpt
+    let response;
+    try {
+      response = await axios.get('https://nue-api.vercel.app/api/lgpt', {
+        params: {
+          text: text,
+          systemPrompt: `Anda adalah AI bernama nueGo anda adalah AI lanjutan buatan NueAPI dan memiliki API di nue-api.vercel.app, Anda dapat mencari informasi dan sudah terintegrasi dengan google search`,
+          aiMessage: aiMessage,
+          user: `${user}${versionAI}`
+        }
+      });
+    } catch (error) {
+      console.error('Error dari lgpt API:', error.message);
+      return res.status(500).send('Gagal memproses jawaban dari AI. Silakan coba lagi nanti.');
+    }
+
+    // Validasi hasil respons AI
+    const result = response.data.result ? response.data.result : 'Tidak ada hasil yang tersedia';
+    const history = response.data.history ? response.data.history : 'Tidak ada riwayat';
+
+    // Kembalikan hasil ke client
+    res.status(200).send({
+      endpoint: `/api/nuego?q=${q}&user=${user}`,
+      google: google_search,
+      result: query_search ? `> ${query_search}\n${result}` : result,
+      history: history
     });
 
-    res.status(200).send({
-      endpoint: `${base}/api/nuego?q=${q}&user=${user}`,
-      google: google_search,
-      result: query_search? `> ${query_search}\n${response.data.result}`:response.data.result,
-      history: response.data.history
-    });
   } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ error: error.message });
+    // Penanganan umum untuk error tak terduga
+    console.error('Error umum:', error.message);
+    res.status(500).json({ error: 'Terjadi kesalahan di server. Silakan coba lagi nanti.' });
   }
 });
 
