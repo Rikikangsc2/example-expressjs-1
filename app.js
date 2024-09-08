@@ -335,7 +335,7 @@ Anda harus menulis jawabannya untuk pengguna`;
 
     // Kembalikan hasil ke client
     res.status(200).send({
-      endpoint: `/api/nuego?q=${q}&user=${user}`,
+      endpoint: `${base}/api/nuego?q=${q}&user=${user}`,
       google: google_search,
       result: query_search ? `> ${query_search}\n${result}` : result,
       history: history
