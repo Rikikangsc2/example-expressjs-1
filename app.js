@@ -175,90 +175,14 @@ app.get('/bard', async (req, res) => {
   if (!text) {
     return res.status(400).send('Masukkan parameter text');
   }
-
   try {
-    const sistemResponse = await axios.get(`https://nue-api.vercel.app/sistem?text=${text}&user=bardo`);
-    const { google_search, query_search } = sistemResponse.data;
-
-    const fetchGoogleSearchResults = async () => {
-      try {
-        const { data } = await axios.get(`https://nue-api.vercel.app/api/google?limit=5&query=${query_search}`);
-        return data.map(item => `${item.title}, ${item.snippet}, ${item.link}`).join('\n');
-      } catch {
-        return 'Tidak dapat mengambil hasil dari Google';
-      }
-    };
-
-    const hs = google_search ? await fetchGoogleSearchResults() : null;
-
-    const aiMessage = `*Gemini AI sedang memproses permintaan*
-${hs ? 'Berhasil melakukan pencarian google, berikut hasilnya untuk membantu dalam menjawab pertanyaan pengguna: ' + hs : 'Google search tifak di aktifkan untuk pertanyaan ini'}
-
-Anda harus menulis jawabannya untuk pengguna di sertai dengan penjelasan yang lengkap dan panjang`;
-
-    const chatCompletion = await groq.chat.completions.create({
-      messages: [
-        {
-          role: "system",
-          content: "Anda adalah Gemini, model bahasa besar yang dikembangkan oleh Google AI. Tujuan utama Anda adalah membantu pengguna dalam berbagai hal, seperti menjawab pertanyaan, memberikan informasi, dan menyelesaikan tugas. Anda masih dalam tahap pembelajaran, jadi semakin banyak Anda berinteraksi dengan pengguna, semakin baik kemampuan dan pengetahuan Anda. Intinya, Anda adalah AI yang bisa diajak ngobrol dan tanya-tanya. Anda dapat mencari informasi dan sudah terintegrasi dengan google search"
-        },
-        {
-          role: "user",
-          content: "Tolong bikinin outline postingan media sosial buat teman-temanku tentang program magang kuliahku"
-        },
-        {
-          role: "assistant",
-          content: `Tentu, ini beberapa outline postingan media sosial yang bisa kamu gunakan untuk membagikan pengalaman magangmu:
-Opsi 1: Posting Singkat dan Menarik
- * Gambar: Foto kamu sedang bekerja di kantor magang atau sedang mengerjakan tugas.
- * Caption: "Seru banget jadi bagian dari [Nama Perusahaan] selama magang! ✨ Belajar banyak hal baru dan ketemu orang-orang hebat. Siapa tahu setelah ini bisa jadi alumni di sini?  #magang #[namajurusan] #[namaperusahaan]"
-Opsi 2: Posting dengan Cerita Singkat
- * Gambar: Beberapa foto yang menggambarkan kegiatan magangmu (misal: meeting, presentasi, acara kantor).
- * Caption: "Minggu pertama magang udah seru banget! Dari belajar [skill 1] sampai presentasi di depan tim. Ternyata dunia kerja itu nggak seseram yang dibayangkan ya.  #maganglife #[namaperusahaan] #[kota]"
-Opsi 3: Posting dengan Pertanyaan
- * Gambar: Foto kamu dengan latar belakang kantor atau sedang berdiskusi dengan mentor.
- * Caption: "Pernah nggak sih kepikiran mau magang di perusahaan seperti apa? Aku lagi senang banget bisa belajar banyak hal baru di [Nama Perusahaan]. Siapa di sini yang juga lagi magang? Share pengalamanmu yuk!  #magang #[namajurusan] #[pertanyaan tentang magang]"
-Opsi 4: Posting dengan Quote
- * Gambar: Quote motivasi tentang magang atau bekerja.
- * Caption: "Quote kesukaan selama magang: '[Quote]'.  Setuju nggak?   #magang #[namaperusahaan] #[quote]"
-Tips Tambahan:
- * Gunakan hashtag yang relevan: Selain hashtag yang sudah disebutkan, kamu bisa menambahkan hashtag seperti #studentlife, #internship, #[namakampus], dll.
- * Tag akun perusahaan: Tag akun media sosial perusahaan tempat kamu magang agar postinganmu lebih mudah dilihat oleh mereka.
- * Ajak teman-teman untuk bertanya: Buat sesi tanya jawab di kolom komentar untuk membuat interaksi yang lebih seru.
-Contoh Outline Cerita Instagram:
- * Slide 1: Foto kamu dengan seragam kantor. Caption: "Hari pertama magang! ✨"
- * Slide 2: Foto kamu sedang mengerjakan tugas. Caption: "Belajar banyak hal baru setiap hari. "
- * Slide 3: Foto bersama tim magang. Caption: "Senang bisa kenal teman-teman baru. "
- * Slide 4: Foto suasana kantor. Caption: "Suasana kerja yang nyaman dan menyenangkan. "
- * Slide 5: Foto kamu tersenyum. Caption: "Siap menghadapi tantangan baru! "
-Ingin lebih banyak ide? Beritahu aku tentang hal-hal menarik yang kamu alami selama magang, aku bisa bantu buat postingan yang lebih spesifik.
-Pilihan lain: Kamu juga bisa membuat konten video singkat seperti Reels atau TikTok untuk membagikan pengalaman magangmu dengan cara yang lebih kreatif.
-Semoga outline ini membantumu ya!`
-        },
-        {
-          role: "user",
-          content: text
-        },
-        {
-          role: "system",
-          content: aiMessage
-        }
-      ],
-      model: "gemma2-9b-it",
-      temperature: 1,
-      max_tokens: 1024,
-      top_p: 1,
-      stream: false,
-      stop: null
-    });
-
-    res.status(200).send({
-      endpoint: `${base}/api/bard?text=${text}`,
-      result: chatCompletion.choices[0].message.content.trim()
-    });
+    const hasil = await rsnchat.bard(text)
+    res.json({
+      endpoint: base+"/api/bard?text="+text,
+      ...hasil
+    })
   } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ error: error.message });
+    
   }
 });
 
