@@ -13,7 +13,7 @@ const { exec } = require('child_process');
 const { RsnChat } = require("rsnchat");
 const Groq = require('groq-sdk');
 const request = require('request');
-const { ytmp4v4, ytmp3v3 } = require('bangriq')
+const { ytmp4v4, ytmp3v3, ytmp3v2, ytmp4v2, ytmp4v3} = require('bangriq')
 
 const key = ['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']
 const randomKey = key[Math.floor(Math.random() * key.length)];
@@ -111,7 +111,7 @@ app.get('/yt-mp3', async (req, res) => {
   }
 
   try {
-    const info = await ytmp3v3(url);
+    const info = await ytmp3v2(url);
     const audioUrl = info.audio;
 
     request({ url: audioUrl, encoding: null }, (err, response, body) => {
@@ -133,7 +133,7 @@ app.get('/yt-mp4', async (req, res) => {
   }
 
   try {
-    const info2 = await ytmp4v4(url);
+    const info2 = await ytmp4v3(url);
     const videoUrl = info2.video;
 
     request({ url: videoUrl, encoding: null }, (err, response, body) => {
