@@ -133,7 +133,7 @@ app.get('/yt-mp4', async (req, res) => {
   }
 
   try {
-    const info2 = await ytmp4v2(url);
+    const info2 = await ytmp4v3(url);
     const videoUrl = info2.video;
 return res.send(info2)
     request({ url: videoUrl, encoding: null }, (err, response, body) => {
