@@ -186,7 +186,7 @@ app.get('/bard', async (req, res) => {
       sistemResponse = await axios.get(`https://nue-api.vercel.app/sistem?text=${text}&user=${versionSistem}`);
     } catch (error) {
       console.error('Error mengambil data dari sistem:', error.message);
-      return res.status(500).send('Gagal mengambil respon dari sistem. Coba lagi nanti.'+error.message);
+      return res.status(500).send('Gagal mengambil respon dari sistem. Coba lagi nanti '+error.message);
     }
 
     const { google_search, query_search } = sistemResponse.data;
@@ -224,7 +224,7 @@ Permintaan saya: ${text}`;
       });
     } catch (error) {
       console.error('Error dari gemini API:', error.message);
-      return res.status(500).send('Gagal memproses jawaban dari AI. Silakan coba lagi nanti.');
+      return res.status(500).send('Gagal memproses jawaban dari AI. Silakan coba lagi nanti '+error.message);
     }
 
     // Kembalikan hasil ke client
