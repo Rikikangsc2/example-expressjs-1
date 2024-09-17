@@ -587,12 +587,12 @@ app.get('/gemini', async (req, res) => {
         const message = response.data.candidates[0].content;
 
         // Respond with AI-generated message
-        res.json({ status: 200, message });
+        res.json({ status: 200, message: message.parts[0].text });
     } catch (error) {
         console.error('Error fetching from Google API:', error.message);
         res.status(500).json({ status: 500, message: 'Failed to generate content' });
     }
-});
+});;
 
 app.get('/gpt', async (req, res) => {
     const { prompt } = req.query;
