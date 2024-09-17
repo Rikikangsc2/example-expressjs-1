@@ -564,20 +564,36 @@ app.get('/image', async (req, res) => {
 });
 
 app.get('/gemini', async (req, res) => {
-  try {
-    if (!req.query.prompt) {
-      return res.status(400).json({ error: 'Query parameter "q" is required' });
+    const query = req.query.q;
+
+    if (!query) {
+        return res.status(400).json({ status: 400, message: 'Query parameter "q" is required' });
     }
 
-    const response = await rsnchat.gemini(req.query.prompt);
+    try {
+        const response = await axios.post(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyCtBDTdbx37uvBqiImuFdZFfAf5RD5igVY`,
+            {
+                contents: [{ parts: [{ text: query }] }]
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }
+        );
 
-    const json = {endpoint:base+"/api/gemini?prompt="+encodeURIComponent(req.query.prompt),status : 200, result : response.message.replace(/\*\*/g, "*")}
-      res.status(200).json(json);
-  } catch (error) {
-      console.error(error);
-    res.status(500).json({ error: error.message });
-  }
+        // Extracting the message text from the response JSON
+        const message = response.data.candidates[0].content;
+
+        // Respond with AI-generated message
+        res.json({ status: 200, message });
+    } catch (error) {
+        console.error('Error fetching from Google API:', error.message);
+        res.status(500).json({ status: 500, message: 'Failed to generate content' });
+    }
 });
+
 app.get('/gpt', async (req, res) => {
     const { prompt } = req.query;
 
