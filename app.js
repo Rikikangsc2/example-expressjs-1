@@ -186,7 +186,7 @@ app.get('/bard', async (req, res) => {
       sistemResponse = await axios.get(`https://nue-api.vercel.app/sistem?text=${text}&user=${versionSistem}`);
     } catch (error) {
       console.error('Error mengambil data dari sistem:', error.message);
-      return res.status(500).send('Gagal mengambil respon dari sistem. Coba lagi nanti.');
+      return res.status(500).send('Gagal mengambil respon dari sistem. Coba lagi nanti.'+error);
     }
 
     const { google_search, query_search } = sistemResponse.data;
