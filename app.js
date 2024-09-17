@@ -195,7 +195,7 @@ app.get('/bard', async (req, res) => {
     let googleResults = '';
     if (google_search) {
       try {
-        const { data } = await axios.get(`https://nue-api.vercel.app/api/google?limit=5&query=${query_search}`);
+        const { data } = await axios.get(`https://nue-api.vercel.app/api/google?limit=10&query=${query_search}`);
         googleResults = data.map(item => `${item.title}, ${item.snippet}, ${item.link}`).join('\n');
       } catch (error) {
         console.error('Error Google Search:', error.message);
@@ -208,7 +208,7 @@ app.get('/bard', async (req, res) => {
     if (google_search) {
       prompt = `Berhasil melakukan pencarian google, berikut hasilnya untuk membantu dalam menjawab pertanyaan pengguna: ${googleResults}
 
-Permintaan saya: ${text}`;
+Permintaan pengguna: ${text}`;
     } else {
       prompt = text;
     }
