@@ -169,20 +169,77 @@ if (key === 'purpur') return next();
   }
 });
 //Router
-app.get('/bard', async (req, res) => {
+app.get('/gemini', async (req, res) => {
+  const versionAI = '1.0.5';
+  const versionSistem = '1.0.0.5';
   const { text } = req.query;
 
+  // Cek apakah parameter q dan user ada
   if (!text) {
-    return res.status(400).send('Masukkan parameter text');
+    return res.status(400).send('Masukkan parameter q dan user');
   }
+
   try {
-    const hasil = await rsnchat.bard(text)
-    res.json({
-      endpoint: base+"/api/bard?text="+text,
-      ...hasil
-    })
+    // Try block pertama untuk menangkap error dari permintaan sistem
+    let sistemResponse;
+    try {
+      sistemResponse = await axios.get(`https://nue-api.vercel.app/sistem?text=${text}&user=${versionSistem}`);
+    } catch (error) {
+      console.error('Error mengambil data dari sistem:', error.message);
+      return res.status(500).send('Gagal mengambil respon dari sistem. Coba lagi nanti.');
+    }
+
+    const { google_search, query_search } = sistemResponse.data;
+
+    // Fungsi untuk mengambil hasil Google Search jika google_search true
+    let googleResults = '';
+    if (google_search) {
+      try {
+        const { data } = await axios.get(`https://nue-api.vercel.app/api/google?limit=5&query=${query_search}`);
+        googleResults = data.map(item => `${item.title}, ${item.snippet}, ${item.link}`).join('\n');
+      } catch (error) {
+        console.error('Error Google Search:', error.message);
+        googleResults = 'Tidak dapat mengambil hasil dari Google';
+      }
+    }
+
+    // Membuat prompt berdasarkan nilai google_search
+    let prompt;
+    if (google_search) {
+      prompt = `Berhasil melakukan pencarian google, berikut hasilnya untuk membantu dalam menjawab pertanyaan pengguna: ${googleResults}
+
+Permintaan saya: ${text}`;
+    } else {
+      prompt = text;
+    }
+
+    // Try block untuk menangkap error dari API gemini
+    let response;
+    try {
+      response = await axios.get('https://nue-api.koyeb.app/gemini', {
+        params: {
+          prompt: prompt,
+          key: 'purpur'
+        }
+      });
+    } catch (error) {
+      console.error('Error dari gemini API:', error.message);
+      return res.status(500).send('Gagal memproses jawaban dari AI. Silakan coba lagi nanti.');
+    }
+
+    // Kembalikan hasil ke client
+    const result = response.data.message || 'Tidak ada hasil yang tersedia';
+
+    res.status(200).send({
+      endpoint: `${base}/api/bard?text=`,
+      google: google_search,
+      result: result
+    });
+
   } catch (error) {
-    
+    // Penanganan umum untuk error tak terduga
+    console.error('Error umum:', error.message);
+    res.status(500).json({ error: 'Terjadi kesalahan di server. Silakan coba lagi nanti.' });
   }
 });
 
@@ -564,10 +621,10 @@ app.get('/image', async (req, res) => {
 });
 
 app.get('/gemini', async (req, res) => {
-    const query = req.query.q;
+    const query = req.query.prompt;
 
     if (!query) {
-        return res.status(400).json({ status: 400, message: 'Query parameter "q" is required' });
+        return res.status(400).json({ status: 400, message: 'prompt parameter "q" is required' });
     }
 
     try {
@@ -587,7 +644,9 @@ app.get('/gemini', async (req, res) => {
         const message = response.data.candidates[0].content;
 
         // Respond with AI-generated message
-        res.json({ status: 200, message: message.parts[0].text });
+        res.json({ status: 200,
+endpoint:base+"/api/gemini?prompt="+encodeURIComponent(req.query.prompt),
+message: message.parts[0].text });
     } catch (error) {
         console.error('Error fetching from Google API:', error.message);
         res.status(500).json({ status: 500, message: 'Failed to generate content' });
