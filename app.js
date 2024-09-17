@@ -169,7 +169,7 @@ if (key === 'purpur') return next();
   }
 });
 //Router
-app.get('/gemini', async (req, res) => {
+app.get('/bard', async (req, res) => {
   const versionAI = '1.0.5';
   const versionSistem = '1.0.0.5';
   const { text } = req.query;
