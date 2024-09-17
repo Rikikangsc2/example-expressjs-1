@@ -195,8 +195,8 @@ app.get('/bard', async (req, res) => {
     let googleResults = '';
     if (google_search) {
       try {
-        const { data } = await axios.get(`https://nue-api.vercel.app/api/google?limit=10&query=${query_search}`);
-        googleResults = data.map(item => `${item.title}, ${item.snippet}, ${item.link}`).join('\n');
+        const { data } = await axios.get(`https://nue-api.vercel.app/api/google?&query=${query_search}`);
+        googleResults = JSON.stringify(data, null, 2);
       } catch (error) {
         console.error('Error Google Search:', error.message);
         googleResults = 'Tidak dapat mengambil hasil dari Google';
