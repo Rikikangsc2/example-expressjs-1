@@ -14,7 +14,6 @@ const { RsnChat } = require("rsnchat");
 const Groq = require('groq-sdk');
 const request = require('request');
 const { ytmp4v4, ytmp3v3, ytmp3v2, ytmp4v2, ytmp4v3, ytmp3, ytmp4} = require('bangriq')
-const { youtubedlv2, youtubedl } = require('@bochilteam/scraper-youtube')
 
 const key = ['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']
 const randomKey = key[Math.floor(Math.random() * key.length)];
@@ -107,13 +106,18 @@ app.get('/sdxllist',async(req,res)=>{await sdxlList(res)})
 
 app.get('/yt-mp3', async (req, res) => {
   const url = req.query.url;
-  if (!url) return res.status(400).json({ error: 'URL parameter is required' });
+  if (!url) {
+    return res.status(400).json({ error: 'URL parameter is required' });
+  }
 
   try {
-    const data = await youtubedl(url);
-    const audioUrl = await data.audio['128kbps'].download();
+    const info = await ytmp3v3(url);
+    const audioUrl = info.audio;
+
     request({ url: audioUrl, encoding: null }, (err, response, body) => {
-      if (err) return res.status(500).json({ error: 'Error fetching audio stream' });
+      if (err) {
+        return res.status(500).json({ error: 'Error fetching audio stream' });
+      }
       res.setHeader('Content-Type', 'audio/mpeg');
       res.send(body);
     });
@@ -124,22 +128,24 @@ app.get('/yt-mp3', async (req, res) => {
 
 app.get('/yt-mp4', async (req, res) => {
   const url = req.query.url;
-  if (!url) return res.status(400).json({ error: 'URL parameter is required' });
+  if (!url) {
+    return res.status(400).json({ error: 'URL parameter is required' });
+  }
 
   try {
-    const data = await youtubedl(url);
-    const resolutions = Object.keys(data.video);
-    const videoUrl = await data.video[resolutions[0]].download();
+    const info2 = await ytmp4v4(url);
+    const videoUrl = info2.video;
     request({ url: videoUrl, encoding: null }, (err, response, body) => {
-      if (err) return res.status(500).json({ error: 'Error fetching video stream' });
+      if (err) {
+        return res.status(500).json({ error: 'Error fetching video stream' });
+      }
       res.setHeader('Content-Type', 'video/mp4');
       res.send(body);
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error:error.message });
   }
 });
-
 
 app.use(async (req, res, next) => {
   const { key } = req.query;
