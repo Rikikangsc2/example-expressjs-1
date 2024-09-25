@@ -14,8 +14,7 @@ const { RsnChat } = require("rsnchat");
 const Groq = require('groq-sdk');
 const request = require('request');
 const { ytmp4v4, ytmp3v3, ytmp3v2, ytmp4v2, ytmp4v3, ytmp3, ytmp4} = require('bangriq')
-const { youtubedlv2 } = require('@bochilteam/scraper-youtube');
-youtubedl = youtubedlv2
+const { youtubedlv2 } = require('@bochilteam/scraper-youtube')
 
 const key = ['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']
 const randomKey = key[Math.floor(Math.random() * key.length)];
@@ -128,7 +127,7 @@ app.get('/yt-mp4', async (req, res) => {
   if (!url) return res.status(400).json({ error: 'URL parameter is required' });
 
   try {
-    const data = await youtubedl(url);
+    const data = await youtubedlv2(url);
     const resolutions = Object.keys(data.video);
     const videoUrl = await data.video[resolutions[0]].download();
     request({ url: videoUrl, encoding: null }, (err, response, body) => {
