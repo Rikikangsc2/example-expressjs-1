@@ -11,8 +11,9 @@
   "license": "ISC",
   "dependencies": {
     "@bochilteam/scraper": "^5.0.1",
+    "@bochilteam/scraper-youtube": "^5.0.0",
     "axios": "^1.7.2",
-    "bangriq":"npm:ruhend-scraper",
+    "bangriq": "npm:ruhend-scraper",
     "body-parser": "^1.20.2",
     "express": "^4.19.2",
     "form-data": "^4.0.0",
