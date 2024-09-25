@@ -14,8 +14,8 @@ const { RsnChat } = require("rsnchat");
 const Groq = require('groq-sdk');
 const request = require('request');
 const { ytmp4v4, ytmp3v3, ytmp3v2, ytmp4v2, ytmp4v3, ytmp3, ytmp4} = require('bangriq')
-const { youtubedl } = require('@bochilteam/scraper-youtube');
-
+const { youtubedlv2 } = require('@bochilteam/scraper-youtube');
+youtubedl = youtubedlv2
 
 const key = ['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']
 const randomKey = key[Math.floor(Math.random() * key.length)];
