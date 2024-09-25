@@ -104,6 +104,36 @@ app.use('/hasil.jpeg', express.static(path.join(__dirname, 'hasil.jpeg')));
 app.get('/sdlist',async(req,res)=>{await sdList(res)})
 app.get('/sdxllist',async(req,res)=>{await sdxlList(res)})
 
+
+app.get('/yt-mp3', async (req, res) => {
+  const url = req.query.url;
+  if (!url) return res.status(400).json({ error: 'URL parameter is required' });
+
+  try {
+    const info = await ytdl.getInfo(url);
+    const audioFormat = ytdl.chooseFormat(info.formats, { quality: 'highestaudio' });
+    res.setHeader('Content-Type', 'audio/mpeg');
+    ytdl(url, { format: audioFormat }).pipe(res);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/yt-mp4', async (req, res) => {
+  const url = req.query.url;
+  if (!url) return res.status(400).json({ error: 'URL parameter is required' });
+
+  try {
+    const info = await ytdl.getInfo(url);
+    const videoFormat = ytdl.chooseFormat(info.formats, { quality: 'highestvideo' });
+    res.setHeader('Content-Type', 'video/mp4');
+    ytdl(url, { format: videoFormat }).pipe(res);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/*
 app.get('/yt-mp3', async (req, res) => {
   const url = req.query.url;
   if (!url) {
@@ -146,7 +176,7 @@ app.get('/yt-mp4', async (req, res) => {
     res.status(500).json({ error:error.message });
   }
 });
-
+*/
 app.use(async (req, res, next) => {
   const { key } = req.query;
   if (!key) {
