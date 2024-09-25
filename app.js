@@ -112,7 +112,7 @@ app.get('/yt-mp3', async (req, res) => {
   }
 
   try {
-    const info = await ytmp3v2(url);
+    const info = await ytmp3v1(url);
     return res.json(info)
     const audioUrl = info.audio;
 
