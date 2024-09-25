@@ -107,41 +107,13 @@ app.get('/sdxllist',async(req,res)=>{await sdxlList(res)})
 
 app.get('/yt-mp3', async (req, res) => {
   const url = req.query.url;
-  if (!url) return res.status(400).json({ error: 'URL parameter is required' });
-
-  try {
-    const info = await ytdl.getInfo(url);
-    const audioFormat = ytdl.chooseFormat(info.formats, { quality: 'highestaudio' });
-    res.setHeader('Content-Type', 'audio/mpeg');
-    ytdl(url, { format: audioFormat }).pipe(res);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.get('/yt-mp4', async (req, res) => {
-  const url = req.query.url;
-  if (!url) return res.status(400).json({ error: 'URL parameter is required' });
-
-  try {
-    const info = await ytdl.getInfo(url);
-    const videoFormat = ytdl.chooseFormat(info.formats, { quality: 'highestvideo' });
-    res.setHeader('Content-Type', 'video/mp4');
-    ytdl(url, { format: videoFormat }).pipe(res);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-/*
-app.get('/yt-mp3', async (req, res) => {
-  const url = req.query.url;
   if (!url) {
     return res.status(400).json({ error: 'URL parameter is required' });
   }
 
   try {
     const info = await ytmp3v3(url);
+    return res.json(info)
     const audioUrl = info.audio;
 
     request({ url: audioUrl, encoding: null }, (err, response, body) => {
@@ -164,6 +136,7 @@ app.get('/yt-mp4', async (req, res) => {
 
   try {
     const info2 = await ytmp4v4(url);
+    return res.json(info2);
     const videoUrl = info2.video;
     request({ url: videoUrl, encoding: null }, (err, response, body) => {
       if (err) {
@@ -176,7 +149,7 @@ app.get('/yt-mp4', async (req, res) => {
     res.status(500).json({ error:error.message });
   }
 });
-*/
+
 app.use(async (req, res, next) => {
   const { key } = req.query;
   if (!key) {
