@@ -14,17 +14,11 @@ const { RsnChat } = require("rsnchat");
 const Groq = require('groq-sdk');
 const request = require('request');
 const { ytmp4v4, ytmp3v3, ytmp3v2, ytmp4v2, ytmp4v3, ytmp3, ytmp4} = require('bangriq')
-const youtubedl = require("youtube-dl-exec");
-const ffmpeg = require("fluent-ffmpeg");
-const ffmpegPath = path.join(process.cwd(), "tmp", "ffmpeg");
-ffmpeg.setFfmpegPath(ffmpegPath);
-
-
 
 const key = ['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']
 const randomKey = key[Math.floor(Math.random() * key.length)];
 const groq = new Groq({ apiKey: randomKey });
-const rsnchat = new RsnChat("rsnai_SQPKHQEtKlh8s9cjovGIiOp");
+const rsnchat = new RsnChat("rsnai_SQPKHQEtlKlh8s9cjovGIiOp");
 
 const userId = 'nueapi'; 
 const ikyDBBaseUrl = 'https://nue-db.vercel.app';
@@ -112,33 +106,20 @@ app.get('/sdxllist',async(req,res)=>{await sdxlList(res)})
 
 app.get('/yt-mp3', async (req, res) => {
   const url = req.query.url;
-  if (!url) return res.status(400).json({ error: 'URL parameter is required' });
-
-  const webmFilePath = path.join(process.cwd(), "tmp", "output.webm");
-  const mp3FilePath = path.join(process.cwd(), "tmp", "output.mp3");
+  if (!url) {
+    return res.status(400).json({ error: 'URL parameter is required' });
+  }
 
   try {
-    await youtubedl(url, {
-      extractAudio: true,
-      audioFormat: "webm",
-      preferFfmpeg: true,
-      output: webmFilePath
-    });
+    const info = await ytmp3v3(url);
+    const audioUrl = info.audio;
 
-    await new Promise((resolve, reject) => {
-      ffmpeg(webmFilePath)
-        .audioBitrate(128)
-        .toFormat("mp3")
-        .on("end", () => resolve())
-        .on("error", reject)
-        .save(mp3FilePath);
-    });
-
-    res.setHeader('Content-Type', 'audio/mpeg');
-    res.sendFile(mp3FilePath, (err) => {
-      if (err) res.status(500).json({ error: 'Error sending file' });
-      fs.unlinkSync(webmFilePath);
-      fs.unlinkSync(mp3FilePath);
+    request({ url: audioUrl, encoding: null }, (err, response, body) => {
+      if (err) {
+        return res.status(500).json({ error: 'Error fetching audio stream' });
+      }
+      res.setHeader('Content-Type', 'audio/mpeg');
+      res.send(body);
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -147,27 +128,24 @@ app.get('/yt-mp3', async (req, res) => {
 
 app.get('/yt-mp4', async (req, res) => {
   const url = req.query.url;
-  if (!url) return res.status(400).json({ error: 'URL parameter is required' });
-
-  const mp4FilePath = path.join(process.cwd(), "tmp", "output.mp4");
+  if (!url) {
+    return res.status(400).json({ error: 'URL parameter is required' });
+  }
 
   try {
-    await youtubedl(url, {
-      format: "bestvideo+bestaudio",
-      preferFfmpeg: true,
-      output: mp4FilePath
-    });
-
-    res.setHeader('Content-Type', 'video/mp4');
-    res.sendFile(mp4FilePath, (err) => {
-      if (err) res.status(500).json({ error: 'Error sending file' });
-      fs.unlinkSync(mp4FilePath);
+    const info2 = await ytmp4v4(url);
+    const videoUrl = info2.video;
+    request({ url: videoUrl, encoding: null }, (err, response, body) => {
+      if (err) {
+        return res.status(500).json({ error: 'Error fetching video stream' });
+      }
+      res.setHeader('Content-Type', 'video/mp4');
+      res.send(body);
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error:error.message });
   }
 });
-
 
 app.use(async (req, res, next) => {
   const { key } = req.query;
