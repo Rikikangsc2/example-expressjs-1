@@ -12,9 +12,8 @@ const { exec } = require('child_process');
 const { RsnChat } = require("rsnchat");
 const Groq = require('groq-sdk');
 const request = require('request');
-const { ytmp4v4, ytmp3v3, ytmp3v2, ytmp4v2, ytmp4v3, ytmp4} = require('bangriq')
-const ytmp3 = require('ytmp3-scrap');
-const ytdl = require('@distube/ytdl-core');
+const ytdl = require('ytdl-core');
+
 
 const key = ['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']
 const randomKey = key[Math.floor(Math.random() * key.length)];
@@ -107,13 +106,18 @@ app.get('/sdxllist',async(req,res)=>{await sdxlList(res)})
 
 app.get('/yt-mp3', async (req, res) => {
   const url = req.query.url;
-  if (!url) return res.status(400).json({ error: 'URL parameter is required' });
+  if (!url) {
+    return res.status(400).json({ error: 'URL parameter is required' });
+  }
 
   try {
     const info = await ytdl.getInfo(url);
-    const format = ytdl.chooseFormat(info.formats, { filter: 'audioonly' });
+    const audioFormat = ytdl.chooseFormat(info.formats, { quality: 'highestaudio' });
+    if (!audioFormat) {
+      return res.status(500).json({ error: 'No audio format available' });
+    }
     res.setHeader('Content-Type', 'audio/mpeg');
-    ytdl(url, { format }).pipe(res);
+    ytdl(url, { format: audioFormat }).pipe(res);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -121,18 +125,23 @@ app.get('/yt-mp3', async (req, res) => {
 
 app.get('/yt-mp4', async (req, res) => {
   const url = req.query.url;
-  if (!url) return res.status(400).json({ error: 'URL parameter is required' });
+  if (!url) {
+    return res.status(400).json({ error: 'URL parameter is required' });
+  }
 
   try {
     const info = await ytdl.getInfo(url);
-    const format = ytdl.chooseFormat(info.formats, { filter: 'video' });
+    const format = ytdl.chooseFormat(info.formats, { quality: 'highest', filter: 'audioandvideo' });
+    if (!format) {
+      return res.status(500).json({ error: 'No combined video and audio format available' });
+    }
     res.setHeader('Content-Type', 'video/mp4');
-    ytdl(url, { format }).pipe(res);
+    ytdl(url, { format: format }).pipe(res);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
-         
+
 app.use(async (req, res, next) => {
   const { key } = req.query;
   if (!key) {

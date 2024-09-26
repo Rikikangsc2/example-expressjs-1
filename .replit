@@ -1,5 +1,5 @@
-modules = ["nodejs-20"]
-run = "bash push.sh"
+modules = ["nodejs-20", "nix"]
+run = "npm start"
 
 [nix]
 channel = "stable-24_05"
