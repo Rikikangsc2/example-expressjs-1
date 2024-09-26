@@ -21,7 +21,6 @@ const key = ['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']
 const randomKey = key[Math.floor(Math.random() * key.length)];
 const groq = new Groq({ apiKey: randomKey });
 const rsnchat = new RsnChat("rsnai_SQPKHQEtlKlh8s9cjovGIiOp");
-const ytmp3 = require('ytmp3-scrap')
 
 const userId = 'nueapi'; 
 const ikyDBBaseUrl = 'https://nue-db.vercel.app';
