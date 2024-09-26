@@ -1,5 +1,4 @@
 const express = require('express');
-const ytdl = require('ytdl-core');
 const path = require('path');
 const fs = require('fs');
 const scrap = require('@bochilteam/scraper');
@@ -14,8 +13,8 @@ const { RsnChat } = require("rsnchat");
 const Groq = require('groq-sdk');
 const request = require('request');
 const { ytmp4v4, ytmp3v3, ytmp3v2, ytmp4v2, ytmp4v3, ytmp4} = require('bangriq')
-const ytmp3 = require('ytmp3-scrap')
-
+const ytmp3 = require('ytmp3-scrap');
+const ytdl = require('@distube/ytdl-core');
 
 const key = ['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']
 const randomKey = key[Math.floor(Math.random() * key.length)];
@@ -108,21 +107,13 @@ app.get('/sdxllist',async(req,res)=>{await sdxlList(res)})
 
 app.get('/yt-mp3', async (req, res) => {
   const url = req.query.url;
-  if (!url) {
-    return res.status(400).json({ error: 'URL parameter is required' });
-  }
+  if (!url) return res.status(400).json({ error: 'URL parameter is required' });
 
   try {
-    const info = await ytmp3(url);
-    const audioUrl = info.audio;
-    return res.json(info)
-    request({ url: audioUrl, encoding: null }, (err, response, body) => {
-      if (err) {
-        return res.status(500).json({ error: 'Error fetching audio stream' });
-      }
-      res.setHeader('Content-Type', 'audio/mpeg');
-      res.send(body);
-    });
+    const info = await ytdl.getInfo(url);
+    const format = ytdl.chooseFormat(info.formats, { filter: 'audioonly' });
+    res.setHeader('Content-Type', 'audio/mpeg');
+    ytdl(url, { format }).pipe(res);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -130,25 +121,18 @@ app.get('/yt-mp3', async (req, res) => {
 
 app.get('/yt-mp4', async (req, res) => {
   const url = req.query.url;
-  if (!url) {
-    return res.status(400).json({ error: 'URL parameter is required' });
-  }
+  if (!url) return res.status(400).json({ error: 'URL parameter is required' });
 
   try {
-    const info2 = await ytmp4v4(url);
-    const videoUrl = info2.video;
-    request({ url: videoUrl, encoding: null }, (err, response, body) => {
-      if (err) {
-        return res.status(500).json({ error: 'Error fetching video stream' });
-      }
-      res.setHeader('Content-Type', 'video/mp4');
-      res.send(body);
-    });
+    const info = await ytdl.getInfo(url);
+    const format = ytdl.chooseFormat(info.formats, { filter: 'video' });
+    res.setHeader('Content-Type', 'video/mp4');
+    ytdl(url, { format }).pipe(res);
   } catch (error) {
-    res.status(500).json({ error:error.message });
+    res.status(500).json({ error: error.message });
   }
 });
-
+         
 app.use(async (req, res, next) => {
   const { key } = req.query;
   if (!key) {
