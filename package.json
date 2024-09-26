@@ -22,6 +22,7 @@
     "node-tesseract-ocr": "^2.2.1",
     "request": "^2.88.2",
     "rsnchat": "^4.0.1",
-    "ytdl-core": "github:Rikikangsc2/node-ytdl-core"
+    "ytdl-core": "github:Rikikangsc2/node-ytdl-core",
+    "ytmp3-scrap": "^1.0.0"
   }
 }

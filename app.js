@@ -13,12 +13,15 @@ const { exec } = require('child_process');
 const { RsnChat } = require("rsnchat");
 const Groq = require('groq-sdk');
 const request = require('request');
-const { ytmp4v4, ytmp3v3, ytmp3v2, ytmp4v2, ytmp4v3, ytmp3, ytmp4} = require('bangriq')
+const { ytmp4v4, ytmp3v3, ytmp3v2, ytmp4v2, ytmp4v3, ytmp4} = require('bangriq')
+const ytmp3 = require('ytmp3-scrap')
+
 
 const key = ['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']
 const randomKey = key[Math.floor(Math.random() * key.length)];
 const groq = new Groq({ apiKey: randomKey });
 const rsnchat = new RsnChat("rsnai_SQPKHQEtlKlh8s9cjovGIiOp");
+const ytmp3 = require('ytmp3-scrap')
 
 const userId = 'nueapi'; 
 const ikyDBBaseUrl = 'https://nue-db.vercel.app';
@@ -111,9 +114,9 @@ app.get('/yt-mp3', async (req, res) => {
   }
 
   try {
-    const info = await ytmp3v3(url);
+    const info = await ytmp3(url);
     const audioUrl = info.audio;
-
+    return res.json(info)
     request({ url: audioUrl, encoding: null }, (err, response, body) => {
       if (err) {
         return res.status(500).json({ error: 'Error fetching audio stream' });
