@@ -12,6 +12,7 @@
   "dependencies": {
     "@bochilteam/scraper": "^5.0.1",
     "@bochilteam/scraper-youtube": "^5.0.0",
+    "@neoxr/youtube-scraper": "^3.1.5",
     "axios": "^1.7.2",
     "body-parser": "^1.20.2",
     "express": "^4.19.2",

@@ -104,39 +104,33 @@ app.use('/hasil.jpeg', express.static(path.join(__dirname, 'hasil.jpeg')));
 app.get('/sdlist',async(req,res)=>{await sdList(res)})
 app.get('/sdxllist',async(req,res)=>{await sdxlList(res)})
 
+
+const { Youtube } = require('@neoxr/youtube-scraper');
+const yt = new Youtube({ fileAsUrl: true });
+
 app.get('/yt-mp3', async (req, res) => {
-  const url = req.query.url;
-  if (!url) {
-    return res.status(400).json({ error: 'URL parameter is required' });
-  }
+  const { url } = req.query;
+  if (!url) return res.status(400).json({ error: 'URL is required' });
 
   try {
-    const info = await ytdl.getInfo(url);
-    const audioFormat = ytdl.chooseFormat(info.formats, { quality: 'highestaudio' });
-    if (!audioFormat) {
-      return res.status(500).json({ error: 'No audio format available' });
-    }
+    const audio = await yt.fetch(url);
     res.setHeader('Content-Type', 'audio/mpeg');
-    ytdl(url, { format: audioFormat }).pipe(res);
+    const audioStream = request(audio.data.url);
+    audioStream.pipe(res);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
 app.get('/yt-mp4', async (req, res) => {
-  const url = req.query.url;
-  if (!url) {
-    return res.status(400).json({ error: 'URL parameter is required' });
-  }
+  const { url } = req.query;
+  if (!url) return res.status(400).json({ error: 'URL is required' });
 
   try {
-    const info = await ytdl.getInfo(url);
-    const format = ytdl.chooseFormat(info.formats, { quality: 'highest', filter: 'audioandvideo' });
-    if (!format) {
-      return res.status(500).json({ error: 'No combined video and audio format available' });
-    }
-    res.setHeader('Content-Type', 'video/mp4');
-    ytdl(url, { format: format }).pipe(res);
+    const video = await yt.fetch(url, 'video', '480p');
+    res.setHeader('Content-Type', 'audio/mpeg');
+    const videoStream = request(video.data.url);
+    videoStream.pipe(res);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
