@@ -115,8 +115,7 @@ app.get('/yt-mp3', async (req, res) => {
   try {
     const audio = await yt.fetch(url);
     res.setHeader('Content-Type', 'audio/mpeg');
-    const audioStream = request(audio.data.url);
-    audioStream.pipe(res);
+   res.redirect(audio.data.url)
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -129,8 +128,7 @@ app.get('/yt-mp4', async (req, res) => {
   try {
     const video = await yt.fetch(url, 'video', '480p');
     res.setHeader('Content-Type', 'audio/mpeg');
-    const videoStream = request(video.data.url);
-    videoStream.pipe(res);
+    res.redirect(video.data.url)
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
