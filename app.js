@@ -13,6 +13,7 @@ const { RsnChat } = require("rsnchat");
 const Groq = require('groq-sdk');
 const request = require('request');
 const ytdl = require('ytdl-core');
+const { youtube } = require('btch-downloader');
 
 
 const key = ['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']
@@ -112,9 +113,8 @@ app.get('/yt-mp3', async (req, res) => {
   const { url } = req.query;
   if (!url) return res.status(400).json({ error: 'URL is required' });
   try {
-    const audio = await yt.fetch(url);
-    res.setHeader('Content-Type', 'audio/mpeg');
-   res.send(Buffer.from(audio.data.url))
+    const audio = await youtube(url);
+    res.redirect(audio.mp3)
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -125,9 +125,8 @@ app.get('/yt-mp4', async (req, res) => {
   if (!url) return res.status(400).json({ error: 'URL is required' });
 
   try {
-    const video = await yt.fetch(url, 'video', '480p');
-    res.setHeader('Content-Type', 'audio/mpeg');
-    res.send(Buffer.from(video.data.url))
+    const video = await youtube(url);
+    res.redirect(video.mp4)
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

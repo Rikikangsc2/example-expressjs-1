@@ -15,6 +15,7 @@
     "@neoxr/youtube-scraper": "^3.1.5",
     "axios": "^1.7.2",
     "body-parser": "^1.20.2",
+    "btch-downloader": "^2.3.2",
     "express": "^4.19.2",
     "form-data": "^4.0.0",
     "g-i-s": "^2.1.7",
