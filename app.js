@@ -13,7 +13,7 @@ const { RsnChat } = require("rsnchat");
 const Groq = require('groq-sdk');
 const request = require('request');
 const ytdl = require('ytdl-core');
-const { youtube } = require('btch-downloader');
+const { youtube, ttdl } = require('btch-downloader');
 
 
 const key = ['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']
@@ -154,6 +154,14 @@ if (key === 'purpur') return next();
   }
 });
 //Router
+app.get('/ttdl', async (req, res) =>{
+  try {
+    const hasil = await ttdl(req.query.url);
+  res.status(200).json({endpoint:`${base}/api/tt-dl?url=`,...hasil});
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 app.get('/bard', async (req, res) => {
   const versionAI = '1.0.5';
   const versionSistem = '1.0.0.5';
