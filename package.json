@@ -10,19 +10,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@bochilteam/scraper": "^5.0.1",
-    "@bochilteam/scraper-youtube": "^5.0.0",
-    "@neoxr/youtube-scraper": "^3.1.5",
-    "axios": "^1.7.2",
-    "body-parser": "^1.20.2",
-    "btch-downloader": "^2.3.2",
-    "express": "^4.19.2",
-    "form-data": "^4.0.0",
-    "g-i-s": "^2.1.7",
-    "groq-sdk": "^0.5.0",
-    "node-tesseract-ocr": "^2.2.1",
-    "request": "^2.88.2",
-    "rsnchat": "^4.0.1",
-    "ytdl-core": "npm:@distube/ytdl-core@latest"
+    "express": "^4.21.1"
   }
 }
