@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "btch-downloader": "^2.3.2",
     "express": "^4.21.1"
   }
 }
