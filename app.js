@@ -1,24 +1,25 @@
+// app.js
 const express = require('express');
+const path = require('path');
 const app = express();
-const port = 8000;
-//++++
-const { ttdl } = require('btch-downloader')
+const PORT = process.env.PORT || 3000;
 
-app.get('/ttdl', async (req, res) => {
-  try {
-    const url = req.query.url;
-    const data = await ttdl(url);
-    res.json(data);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Error downloading video');
-  }
-});
+// Set EJS as templating engine
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
-app.get('/', (req, res) => {
-  res.send('Hello World!');
-});
+// Static files
+app.use(express.static(path.join(__dirname, 'public')));
 
-app.listen(port, () => {
-  console.log(`Server is listening on port ${port}`);
+// Routes page
+const indexRouter = require('./routes/index');
+app.use('/', indexRouter);
+
+//Routes Api
+const apiRouter = require('./routes/api');
+app.use('/api/v1', apiRouter);
+
+// Server
+app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
 });
