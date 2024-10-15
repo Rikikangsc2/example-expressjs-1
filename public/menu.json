@@ -1,5 +1,37 @@
 [
     {
+        "title": "Twitter Downloader",
+        "description": "Download Twitter videos by URL",
+        "endpoint": "/api/v1/twitter",
+        "params": [
+            { "name": "url", "example": "https://twitter.com/gofoodindonesia/status/1229369819511709697" }
+        ]
+    },
+    {
+        "title": "Facebook Downloader",
+        "description": "Download Facebook videos by URL",
+        "endpoint": "/api/v1/fbdown",
+        "params": [
+            { "name": "url", "example": "https://fb.watch/mcx9K6cb6t/?mibextid=8103lRmnirLUhozF" }
+        ]
+    },
+    {
+        "title": "TikTok Downloader",
+        "description": "Download TikTok videos by URL",
+        "endpoint": "/api/v1/ttdl",
+        "params": [
+            { "name": "url", "example": "https://www.tiktok.com/@omagadsus/video/7025456384175017243?is_from_webapp=1&sender_device=pc&web_id6982004129280116226" }
+        ]
+    },
+    {
+        "title": "Instagram Downloader",
+        "description": "Download Instagram posts by URL",
+        "endpoint": "/api/v1/igdl",
+        "params": [
+            { "name": "url", "example": "https://www.instagram.com/p/ByxKbUSnubS/?utm_source=ig_web_copy_link" }
+        ]
+    },
+    {
         "title": "AI Character",
         "description": "Create your own AI character with Llama3 + 20 chat memory",
         "endpoint": "/api/v1/llama",
