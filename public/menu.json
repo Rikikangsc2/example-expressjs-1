@@ -1,12 +1,12 @@
 [
     {
-        "title": "AI Logic",
-        "description": "Buat AI Anda sendiri dengan model llama3-70b-8192 dengan sesi chat",
-        "endpoint": "/api/lgpt",
+        "title": "AI Character",
+        "description": "Create your own AI character with Llama3 + 20 chat memory",
+        "endpoint": "/api/v1/llama",
         "params": [
             { "name": "user", "example": "John Doe" },
-            { "name": "systemPrompt", "example": "Anda adalah asisten AI" },
-            { "name": "text", "example": "Halo!" }
+            { "name": "systemPrompt", "example": "You are an AI assistant" },
+            { "name": "text", "example": "helo!" }
         ]
     }
 ]
