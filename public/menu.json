@@ -1,5 +1,13 @@
 [
     {
+        "title": "Image Upscaler",
+        "description": "Upscale images by URL",
+        "endpoint": "/api/v1/upscale",
+        "params": [
+            { "name": "url", "example": "https://purapi.koyeb.app/icon.jpg" }
+        ]
+    },
+    {
         "title": "Twitter Downloader",
         "description": "Download Twitter videos by URL",
         "endpoint": "/api/v1/twitter",

@@ -5,8 +5,84 @@ const fs = require('fs');
 const path = require('path');
 const { handleChat } = require('../module/llama');
 const {twitter, igdl, ttdl,fbdown} = require('btch-downloader');
-
+const apiKey = require("../module/prodiaKey");
+const keynya = apiKey();
 ///----
+
+router.get('/upscale', async (req, res) => {
+  const link = req.query.url;
+  if (!link) {
+    return res.status(400).send('URL parameter is required');
+  }
+
+  if (!keynya) {
+    return res.status(500).json({ error: 'API key is missing' });
+  }
+
+  try {
+    // Mendownload gambar dari URL yang diberikan
+    const response = await axios.get(link, { responseType: 'arraybuffer' });
+    const base64Image = Buffer.from(response.data).toString('base64');
+
+    // Mengirim gambar dalam base64 ke API upscale
+    const options = {
+      method: 'POST',
+      url: 'https://api.prodia.com/v1/upscale',
+      headers: {
+        accept: 'application/json',
+        'content-type': 'application/json',
+        'X-Prodia-Key': keynya
+      },
+      data: {
+        resize: 2,
+        model: 'SwinIR 4x',
+        imageData: base64Image
+      }
+    };
+
+    const apiResponse = await axios(options);
+    const data = apiResponse.data;
+
+    // Menggunakan loop polling dengan interval 5 detik
+    let data2;
+    let status = 'pending';
+    const maxRetries = 30;  // Batas maksimal percobaan untuk menghindari loop tak terbatas
+    let attempts = 0;
+
+    while (status !== 'succeeded' && attempts < maxRetries) {
+      const options2 = {
+        method: 'GET',
+        url: `https://api.prodia.com/v1/job/${data.job}`,
+        headers: {
+          accept: 'application/json',
+          'X-Prodia-Key': keynya
+        }
+      };
+
+      const response2 = await axios.request(options2);
+      data2 = response2.data;
+      status = data2.status;
+
+      if (status !== 'succeeded') {
+        console.log(`Status saat ini: ${status}. Menunggu 5 detik...`);
+        await new Promise(resolve => setTimeout(resolve, 5000));  // Menunggu 5 detik
+      }
+
+      attempts++;
+    }
+
+    if (status === 'succeeded') {
+      res.status(200).json(data2);
+    } else {
+      res.status(500).json({ error: 'Job did not complete in time' });
+    }
+
+  } catch (error) {
+    console.error('Error:', error.response ? error.response.data : error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 router.get('/twitter', async (req, res) => {
   const url = req.query.url;
   if (!url) return res.json({ error: 'Missing url parameter' });
