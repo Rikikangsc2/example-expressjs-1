@@ -1,21 +1,5 @@
 [
     {
-        "title": "YouTube to MP3",
-        "description": "Download YouTube videos as MP3",
-        "endpoint": "/api/v1/ytmp3",
-        "params": [
-            { "name": "url", "example": "https://youtu.be/iik25wqIuFo" }
-        ]
-    },
-    {
-        "title": "YouTube to MP4",
-        "description": "Download YouTube videos as MP4",
-        "endpoint": "/api/v1/ytmp4",
-        "params": [
-            { "name": "url", "example": "https://youtu.be/iik25wqIuFo" }
-        ]
-    },
-    {
         "title": "Image Upscaler",
         "description": "Upscale images by URL",
         "endpoint": "/api/v1/upscale",

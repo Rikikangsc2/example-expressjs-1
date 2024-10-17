@@ -5,28 +5,9 @@ const fs = require('fs');
 const path = require('path');
 const { handleChat } = require('../module/llama');
 const {twitter, igdl, ttdl,fbdown} = require('btch-downloader');
-const ytdl = require('@neoxr/ytdl-core');
 const apiKey = require("../module/prodiaKey");
 const keynya = apiKey();
 ///----
-
-router.get('/ytmp3', async (req, res) => {
-  const { url } = req.query;
-  if (!url || !ytdl.validateURL(url)) return res.status(400).send('Invalid URL');
-  const info = await ytdl.getInfo(url);
-  const format = ytdl.chooseFormat(info.formats, { filter: 'audioonly', quality: 'highestaudio' });
-  res.header('Content-Disposition', `attachment; filename="${info.videoDetails.title}.mp3"`);
-  ytdl(url, { format }).pipe(res);
-});
-
-router.get('/ytmp4', async (req, res) => {
-  const { url } = req.query;
-  if (!url || !ytdl.validateURL(url)) return res.status(400).send('Invalid URL');
-  const info = await ytdl.getInfo(url);
-  const format = ytdl.chooseFormat(info.formats, { filter: 'videoandaudio', quality: 'highest' });
-  res.header('Content-Disposition', `attachment; filename="${info.videoDetails.title}.mp4"`);
-  ytdl(url, { format }).pipe(res);
-});
 
 router.get('/upscale', async (req, res) => {
   const link = req.query.url;
