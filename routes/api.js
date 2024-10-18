@@ -5,9 +5,29 @@ const fs = require('fs');
 const path = require('path');
 const { handleChat } = require('../module/llama');
 const {twitter, igdl, ttdl,fbdown} = require('btch-downloader');
+const { alldown } = require('nayan-media-downloader');
 const apiKey = require("../module/prodiaKey");
 const keynya = apiKey();
 ///----
+
+router.get('/all-dl', async (req, res) => {
+    const url = req.query.url;
+
+    if (!url) {
+        return res.status(400).json({ error: 'URL is required' });
+    }
+
+    try {
+        const data = await alldown(url);
+        res.json(data);
+    } catch (error) {
+        res.status(400).json({
+            message:error.message,
+            error: 'An error occurred while processing the request',
+            supportedPlatforms: ['facebook', 'tiktok', 'twitter', 'instagram', 'youtube', 'pinterest', 'gdrive', 'capcut', 'likee', 'threads']
+        });
+    }
+});
 
 router.get('/upscale', async (req, res) => {
   const link = req.query.url;

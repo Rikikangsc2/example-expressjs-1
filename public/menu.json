@@ -1,5 +1,13 @@
 [
     {
+        "title": "Social Media Downloader (All Platforms)",
+        "description": "Download videos from all social media platforms (facebook, tiktok, twitter, instagram, youtube, pinterest, gdrive, capcut, likee, threads)",
+        "endpoint": "/api/v1/all-dl",
+        "params": [
+            { "name": "url", "example": "https://youtube.com/watch?v=DC5Hgj82pc8" }
+        ]
+    },
+    {
         "title": "Image Upscaler",
         "description": "Upscale images by URL",
         "endpoint": "/api/v1/upscale",
