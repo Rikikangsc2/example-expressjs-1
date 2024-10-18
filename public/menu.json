@@ -1,5 +1,21 @@
 [
     {
+        "title": "Play Music",
+        "description": "Play music from Spotify servers",
+        "endpoint": "/api/v1/play",
+        "params": [
+            { "name": "q", "example": "My Love" }
+        ]
+    },
+    {
+        "title": "YouTube Downloader",
+        "description": "Download YouTube videos by URL",
+        "endpoint": "/api/v1/ytdl",
+        "params": [
+            { "name": "url", "example": "https://youtu.be/aRSuyrZFu_Q?si=bsfzgeeGmRpsHqnF" }
+        ]
+    },
+    {
         "title": "Social Media Downloader (All Platforms)",
         "description": "Download videos from all social media platforms (facebook, tiktok, twitter, instagram, youtube, pinterest, gdrive, capcut, likee, threads)",
         "endpoint": "/api/v1/all-dl",

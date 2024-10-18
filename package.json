@@ -15,6 +15,7 @@
     "ejs": "^3.1.10",
     "express": "^4.21.1",
     "groq-sdk": "^0.7.0",
-    "nayan-media-downloader": "^2.6.2"
+    "nayan-media-downloader": "^2.6.2",
+    "nayan-server": "^2.4.2"
   }
 }

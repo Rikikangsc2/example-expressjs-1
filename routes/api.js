@@ -5,11 +5,40 @@ const fs = require('fs');
 const path = require('path');
 const { handleChat } = require('../module/llama');
 const {twitter, igdl, ttdl,fbdown} = require('btch-downloader');
-const { alldown } = require('nayan-media-downloader');
+const { alldown, ytdown } = require('nayan-media-downloader');
 const apiKey = require("../module/prodiaKey");
 const keynya = apiKey();
+const { spotify } = require("nayan-server");
 ///----
-
+router.get('/ytdl', async (req, res) => {
+    const url = req.query.url;
+    if (!url) {
+        return res.status(400).json({ error: 'URL is required' });
+    }
+    try {
+        const URL = await ytdown(url);
+        res.json(URL.data);
+    } catch (error) {
+        res.status(400).json({ error: 'An error occurred while processing the request' });
+    }
+});
+router.get('/play', async (req, res) => {
+    const name = req.query.q;
+    if (!name) {
+        return res.status(400).json({ error: 'q is required' });
+    }
+    try {
+        const data = await spotify(name);
+        const audio = data.data.audio;
+       const response= await axios.get(audio, { responseType: 'arraybuffer' });
+      const buffer = Buffer.from(response.data);
+      res.setHeader("Content-Type", "audio/mpeg");
+      res.send(buffer);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'An error occurred while processing the request' });
+    }
+});
 router.get('/all-dl', async (req, res) => {
     const url = req.query.url;
 
