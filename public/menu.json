@@ -1,5 +1,30 @@
 [
     {
+        "title": "Simsimi Chat",
+        "description": "Chat with Simsimi",
+        "endpoint": "/api/v1/simi",
+        "params": [
+            { "name": "text", "example": "Hallo simi" },
+            { "name": "lang", "example": "id" }
+        ]
+    },
+    {
+        "title": "Remove Background",
+        "description": "Remove the background of an image",
+        "endpoint": "/api/v1/removebg",
+        "params": [
+            { "name": "url", "example": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSn5vEBqDYqAnpxfEq93TF_lV5MZJ3hpIe4rktjybRRgSZeMiGAjkSbSLo&s=10" }
+        ]
+    },
+    {
+        "title": "Pinterest Downloader",
+        "description": "Download images from Pinterest by searching",
+        "endpoint": "/api/v1/pinterest",
+        "params": [
+            { "name": "q", "example": "ronaldo" }
+        ]
+    },
+    {
         "title": "Play Music",
         "description": "Play music from Spotify servers",
         "endpoint": "/api/v1/play",

@@ -8,8 +8,53 @@ const {twitter, igdl, ttdl,fbdown} = require('btch-downloader');
 const { alldown, ytdown } = require('nayan-media-downloader');
 const apiKey = require("../module/prodiaKey");
 const keynya = apiKey();
-const { spotify } = require("nayan-server");
+const { spotify, pintarest, removebg } = require("nayan-server");
+const chatsimsimi = require('chats-simsimi').default;
 ///----
+
+
+router.get('/simi', async (req, res) => {
+  const text = req.query.text;
+  const lang = req.query.lang || "id";
+  if (!text) {
+    return res.status(400).json({ error: 'Text is required' });
+  }
+  try {
+    const response = await chatsimsimi(text, lang, true);
+    res.json({ response });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred while processing the request' });
+  }
+});
+router.get('/removebg', async (req, res) => {
+  const url = req.query.url;
+  if (!url) {
+    return res.status(400).json({ error: 'URL is required' });
+  }
+  try {
+    const data = await removebg(url);
+    res.json(data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred while processing the request' });
+  }
+});
+
+router.get('/pintarest', async (req, res) => {
+  const search = req.query.q;
+  if (!search) {
+    return res.status(400).json({ error: 'q is required' });
+  }
+  try {
+    const data = await pintarest(search);
+    res.json(data.data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred while processing the request' });
+  }
+});
+
 router.get('/ytdl', async (req, res) => {
     const url = req.query.url;
     if (!url) {
@@ -29,11 +74,7 @@ router.get('/play', async (req, res) => {
     }
     try {
         const data = await spotify(name);
-        const audio = data.data.audio;
-       const response= await axios.get(audio, { responseType: 'arraybuffer' });
-      const buffer = Buffer.from(response.data);
-      res.setHeader("Content-Type", "audio/mpeg");
-      res.send(buffer);
+        res.json(data.data);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'An error occurred while processing the request' });
