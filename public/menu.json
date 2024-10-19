@@ -19,7 +19,7 @@
     {
         "title": "Pinterest Downloader",
         "description": "Download images from Pinterest by searching",
-        "endpoint": "/api/v1/pinterest",
+        "endpoint": "/api/v1/pintarest",
         "params": [
             { "name": "q", "example": "ronaldo" }
         ]
