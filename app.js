@@ -20,6 +20,20 @@ app.use('/', indexRouter);
 const apiRouter = require('./routes/api');
 app.use('/api/v1', apiRouter);
 
+// global error
+app.use((req, res, next) => {
+  const error = new Error('Not Found');
+  error.status = 404;
+  next(error);
+});
+
+app.use((err, req, res, next) => {
+  const statusCode = err.status || 500;
+  res.status(statusCode).json({
+    status: 'error',
+    message: err.message || 'Internal Server Error',
+  });
+});
 // Server
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
