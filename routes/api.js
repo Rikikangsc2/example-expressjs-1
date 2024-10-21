@@ -10,9 +10,76 @@ const apiKey = require("../module/prodiaKey");
 const keynya = apiKey();
 const { spotify, pintarest, removebg } = require("nayan-server");
 const chatsimsimi = require('chats-simsimi').default;
+const randomUseragent = require('random-useragent');
 ///----
+router.get('/char-search', async (req, res) => {
+    const query = req.query.q;
+    try {
+        const userAgent = randomUseragent.getRandom();
+        const { data } = await axios.get(`https://api.jikan.moe/v4/characters?q=${query}`, {
+            headers: { 'User-Agent': userAgent }
+        });
+        const charData = await Promise.all(data.data.map(async char => {
+            const translatedAbout = await axios.get(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=id&dt=t&q=${encodeURI(char.about)}`, {
+                headers: { 'User-Agent': userAgent }
+            }).then(response => response.data[0].map(item => item[0]).join(' '));
+            return {
+                name: char.name || '',
+                image: char.images?.jpg?.image_url || '',
+                desc: translatedAbout || ''
+            };
+        }));
+        res.send(charData); // returns a string for each field
+    } catch {
+        res.status(500).send('Error');
+    }
+});
 
+router.get('/anime-search', async (req, res) => {
+    const query = req.query.q;
+    try {
+        const userAgent = randomUseragent.getRandom();
+        const { data } = await axios.get(`https://api.jikan.moe/v4/anime?q=${query}`, {
+            headers: { 'User-Agent': userAgent }
+        });
+        const animeData = await Promise.all(data.data.map(async anime => {
+            return {
+                title: anime.title || '',
+                thumbnail: anime.images?.jpg?.image_url || '',
+                genre: anime.genres.length > 0 ? anime.genres.map(g => g.name).join(', ') : '',
+                score: anime.score?.toString() || '', // score as string
+                trailer: anime.trailer?.url || '' // YouTube link as string
+            };
+        }));
+        res.send(animeData); // returns strings for each field
+    } catch {
+        res.status(500).send('Error');
+    }
+});
 
+router.get('/schedule', async (req, res) => {
+    const day = req.query.day.toLowerCase();
+    try {
+        const userAgent = randomUseragent.getRandom();
+        const translatedDay = await axios.get(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${encodeURI(day)}`, {
+            headers: { 'User-Agent': userAgent }
+        }).then(response => response.data[0][0][0]);
+        const { data } = await axios.get(`https://api.jikan.moe/v4/schedules?filter=${translatedDay}`, {
+            headers: { 'User-Agent': userAgent }
+        });
+        const list = await Promise.all(data.data.map(async anime => ({
+            title: anime.title || '',
+            thumbnail: anime.images?.jpg?.image_url || '',
+            genre: anime.genres.length > 0 ? anime.genres.map(g => g.name).join(', ') : '',
+            score: anime.score?.toString() || '', // score as string
+            trailer: anime.trailer?.url || '' // YouTube link as string
+        })));
+        const template = `Berikut anime yang update setiap hari *${day}:* \n> ${list.length > 0 ? list.map(anime => anime.title).join('\n> ') : 'Tidak ada anime untuk hari ini.'}`;
+        res.json({massage:template}); // return template as string
+    } catch {
+        res.status(500).send('Error');
+    }
+});
 router.get('/simi', async (req, res) => {
   const text = req.query.text;
   const lang = req.query.lang || "id";

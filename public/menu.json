@@ -1,5 +1,29 @@
 [
     {
+        "title": "Character Search",
+        "description": "Search for anime characters",
+        "endpoint": "/api/v1/char-search",
+        "params": [
+            { "name": "q", "example": "Tanjiro Kamado" }
+        ]
+    },
+    {
+        "title": "Anime Search",
+        "description": "Search for anime",
+        "endpoint": "/api/v1/anime-search",
+        "params": [
+            { "name": "q", "example": "Demon Slayer" }
+        ]
+    },
+    {
+        "title": "Anime Schedule",
+        "description": "Get anime schedule by day (Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday)",
+        "endpoint": "/api/v1/schedule",
+        "params": [
+            { "name": "day", "example": "Monday" }
+        ]
+    },
+    {
         "title": "Simsimi Chat",
         "description": "Chat with Simsimi",
         "endpoint": "/api/v1/simi",
