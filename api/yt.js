@@ -20,15 +20,14 @@ module.exports = async (req, res) => {
         const response = await axios.get(downloadUrl.audio, { responseType: "arraybuffer" });
 
  res.header("Content-Type", 'audio/mpeg');
-  res.header("Content-Disposition", 'attachment; filename="audio.mp3"')
-        res.send(Buffer.from(response.data, "binary"));
+  res.send(Buffer.from(response.data, "binary"));
         break;
       }
         case "mp4": {
           const response = await axios.get(downloadUrl.video, { responseType: "arraybuffer"});
           
 res.header("Content-Type", "video/mp4"); 
-res.header("Content-Disposition", 'attachment; filename="video.mp4"');  res.send(Buffer.from(response.data, "binary"));
+res.send(Buffer.from(response.data, "binary"));
         }break;
       }
   
