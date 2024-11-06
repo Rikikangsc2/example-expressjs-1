@@ -14,16 +14,16 @@ module.exports = async (req, res) => {
     // Unduh video dari YouTube
     const downloadUrl = await ytdown(videoUrl);
 
-    switch (type) {
+    switch (type) { 
       case "mp3":{
-        res.header("Content-Type", "audio/mpeg");
-        const response = await axios.get(downloadUrl.data.audio, { responseType: "arraybuffer" });
+        res.header("Content-Type", 'audio/mpeg');
+        const response = await axios.get(downloadUrl.data.audio, { responseType: "arraybuffer", headers: { "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36"}});
         res.send(Buffer.from(response.data, "binary"));
         break;
       }
         case "mp4": {
           res.header("Content-Type", "video/mp4");
-          const response = await axios.get(downloadUrl.data.video, { responseType: "arraybuffer" });
+          const response = await axios.get(downloadUrl.data.video, { responseType: "arraybuffer", headers: { "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537"}});
           res.send(Buffer.from(response.data, "binary"));
         }break;
       }
