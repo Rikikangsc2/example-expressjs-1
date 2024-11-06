@@ -1,4 +1,5 @@
-const { ytdown } = require("nayan-media-downloader");
+const { ytmp3, ytmp4} = require('ruhend-scraper')
+
 const axios = require("axios");
 
 module.exports = async (req, res) => {
@@ -6,25 +7,28 @@ module.exports = async (req, res) => {
     // Ambil URL video dari request body atau query parameter
     const videoUrl = req.query.url;
     const type = req.query.type;
-
+    type === "mp3" ? ytdown = ytmp3: ytdown = ytmp4;
     if (!videoUrl) {
       return res.status(400).json({ error: "URL video tidak diberikan" });
     }
 
     // Unduh video dari YouTube
     const downloadUrl = await ytdown(videoUrl);
-
-    switch (type) { 
+      switch (type) { 
       case "mp3":{
-        res.header("Content-Type", 'audio/mpeg');
-        const response = await axios.get(downloadUrl.data.audio, { responseType: "arraybuffer", headers: { "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36"}});
+        
+        const response = await axios.get(downloadUrl.audio, { responseType: "arraybuffer" });
+
+ res.header("Content-Type", 'audio/mpeg');
+  res.header("Content-Disposition", 'attachment; filename="audio.mp3"')
         res.send(Buffer.from(response.data, "binary"));
         break;
       }
         case "mp4": {
-          res.header("Content-Type", "video/mp4");
-          const response = await axios.get(downloadUrl.data.video, { responseType: "arraybuffer", headers: { "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537"}});
-          res.send(Buffer.from(response.data, "binary"));
+          const response = await axios.get(downloadUrl.video, { responseType: "arraybuffer"});
+          
+res.header("Content-Type", "video/mp4"); 
+res.header("Content-Disposition", 'attachment; filename="video.mp4"');  res.send(Buffer.from(response.data, "binary"));
         }break;
       }
   

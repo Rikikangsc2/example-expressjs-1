@@ -18,6 +18,7 @@
     "groq-sdk": "^0.7.0",
     "nayan-media-downloader": "^2.6.2",
     "nayan-server": "^2.4.2",
-    "random-useragent": "^0.5.0"
+    "random-useragent": "^0.5.0",
+    "ruhend-scraper": "^8.0.3"
   }
 }
