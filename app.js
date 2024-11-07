@@ -4,6 +4,7 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const yt = require('./api/yt');
+const gemini = require('./api/gemini');
 
 // Set EJS as templating engine
 app.set('view engine', 'ejs');
@@ -11,7 +12,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('json spaces', 2);
 
 app.get('/yt',yt)
-
+app.get('/gemini',gemini.handleChat)
 
 // global error
 app.use((req, res, next) => {
