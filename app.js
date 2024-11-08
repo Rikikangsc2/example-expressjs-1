@@ -5,6 +5,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const yt = require('./api/yt');
 const gemini = require('./api/gemini');
+const aio = require('./api/aio');
 
 // Set EJS as templating engine
 app.set('view engine', 'ejs');
@@ -13,6 +14,7 @@ app.set('json spaces', 2);
 
 app.get('/yt',yt)
 app.get('/gemini',gemini)
+app.get('/aio', aio)
 
 // global error
 app.use((req, res, next) => {
