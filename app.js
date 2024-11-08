@@ -12,7 +12,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('json spaces', 2);
 
 app.get('/yt',yt)
-app.get('/gemini',gemini.handleChat)
+app.get('/gemini',gemini)
 
 // global error
 app.use((req, res, next) => {
