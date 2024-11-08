@@ -1,0 +1,20 @@
+{
+  "Riki": [
+    {
+      "role": "user",
+      "parts": [
+        {
+          "text": "apa kabar"
+        }
+      ]
+    },
+    {
+      "role": "model",
+      "parts": [
+        {
+          "text": "Hai! Aku baik-baik saja, terima kasih sudah bertanya. Apa kabar kamu? 😊 \n"
+        }
+      ]
+    }
+  ]
+}
