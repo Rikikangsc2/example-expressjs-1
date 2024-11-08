@@ -46,7 +46,7 @@ const saveHistory = (user, history) => {
   try {
     initializeDb();
     const data = JSON.parse(fs.readFileSync(dbPath, 'utf8'));
-    if (history.length > 30) history.shift();
+    if (history.length > 20) history = history.slice(-20); // Keep only the last 20 entries
     data[user] = history;
     fs.writeFileSync(dbPath, JSON.stringify(data, null, 2), 'utf8');
   } catch (error) {
@@ -55,13 +55,19 @@ const saveHistory = (user, history) => {
 };
 
 module.exports = async (req, res) => {
-  const { text, systemPrompt, user } = req.query;
+  const { text, user } = req.query;
   let history = loadHistory(user);
+
+  // Check if the text is "reset" and reset history if true
+  if (text === "reset") {
+    history = [];
+    saveHistory(user, history);
+    return res.json({ result: "Chat history has been reset." });
+  }
 
   try {
     const model = genAI.getGenerativeModel({
       model: "gemini-1.5-flash",
-      systemInstruction: systemPrompt || "Kamu adalah Alicia AI yang ramah, dan akrab!.",
     });
 
     const chatSession = model.startChat({
@@ -78,8 +84,7 @@ module.exports = async (req, res) => {
     res.json({ result: responseText });
   } catch (error) {
     console.error('Error during chat session:', error);
-    history.splice(-5, 5);
-    saveHistory(user, history);
-    res.status(500).json({ error: 'An error occurred while processing the request.' });
+    // Suggest resetting history if the error persists
+    res.status(500).json({ error: 'An error occurred while processing the request. If this issue persists, please consider resetting the chat history.' });
   }
 };
