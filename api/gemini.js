@@ -5,7 +5,7 @@ const API_URL = "https://api.groq.com/openai/v1/chat/completions";
 const API_KEY = "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";
 const dbPath = 'db/data.json';
 const modelPath = 'db/model.json';
-const MODEL_NAME = "llama3-8b-8192";
+const MODEL_NAME = "llama3-70b-8192";
 
 // Configuration for API request
 const generationConfig = {
