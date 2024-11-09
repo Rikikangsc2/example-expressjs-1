@@ -6,6 +6,7 @@ const API_KEY = Math.random() < 0.5 ? "gsk_UiKN5pJMzTyYvJBttLgwWGdyb3FYSrCt8dbL9
 const dbPath = 'db/data.json';
 const modelPath = 'db/model.json';
 const MODEL_NAME = "gemma2-9b-it";
+let gambar = null;
 
 // Configuration for API request
 const generationConfig = {
@@ -78,14 +79,24 @@ const saveModelConfig = (user, config) => {
 const manageTokenCount = (history) => {
   let totalTokens = history.reduce((acc, msg) => acc + msg.content.length, 0);
   while (totalTokens > 3000 && history.length > 1) {
-    history.shift(); // Remove the oldest message until total tokens are under 7192
+    history.shift(); // Remove the oldest message until total tokens are under 3000
     totalTokens = history.reduce((acc, msg) => acc + msg.content.length, 0);
   }
   return history;
 };
 
 module.exports = async (req, res) => {
-  const { text, user } = req.query;
+  const { text, user, url } = req.query;
+
+if (url) {
+  try {
+    const response = await axios.get('https://purapi.koyeb.app/imgtext', {params: {url: url, text: text}});
+    gambar = response.data.trim()
+  } catch (error) {
+    gambar = null
+  }
+}
+  
   let history = loadHistory(user);
   const modelConfig = loadModelConfig(user);
 
@@ -108,6 +119,7 @@ module.exports = async (req, res) => {
   }
 
   // Update history with new user message
+  gambar ? history.push({ role: "assistant", content: `[!image:${gambar}]` }) : ""
   history.push({ role: "user", content: text });
 
   // Trim history to keep within token limit
