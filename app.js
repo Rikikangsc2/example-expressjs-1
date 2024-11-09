@@ -11,7 +11,7 @@ const aio = require('./api/aio');
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.set('json spaces', 2);
-
+app.use(express.static(path.join(__dirname, 'db')));
 app.get('/yt',yt)
 app.get('/gemini',gemini)
 app.get('/aio', aio)
