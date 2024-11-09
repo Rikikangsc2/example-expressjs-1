@@ -5,12 +5,12 @@ const API_URL = "https://api.groq.com/openai/v1/chat/completions";
 const API_KEY = Math.random() < 0.5 ? "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" : "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";
 const dbPath = 'db/data.json';
 const modelPath = 'db/model.json';
-const MODEL_NAME = "llama-3.1-8b-instant";
+const MODEL_NAME = "gemma2-9b-it";
 
 // Configuration for API request
 const generationConfig = {
   temperature: 1,
-  max_tokens: 500,
+  max_tokens: 200,
   top_p: 1,
   stream: false,
   stop: null,
