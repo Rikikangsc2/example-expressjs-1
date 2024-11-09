@@ -119,7 +119,7 @@ if (url) {
   }
 
   // Update history with new user message
-  history.push({ role: "user", content: `${text}${gambar ? "\n\n[!img: "+gambar+"](Jelaskan deskripsi gambar tersebut ke pengguna seolah olah anda melihat gambar!.)": ""}` });
+  history.push({ role: "user", content: `${text}${gambar ? "\n\n[!img: "+gambar+"](Jelaskan deskripsi gambar ke pengguna, dan jangan di lebih lebihkan atau bahkan di kurangi. Jadi berikan apa adanya saja!.\n\nNote: Jika deskripsi belum jelas dan tidak bisa untuk memenuhi permintaan pengguna silahkan beri respon \"Gambar Kurang jelas!\")": ""}` });
 
   // Trim history to keep within token limit
   history = manageTokenCount(history);

@@ -1,30 +1,3 @@
 {
-  "hehd": {
-    "history": [
-      {
-        "role": "user",
-        "content": "gambar apa itu ya\n\n[!img: The image is a foreign language text, which appears to be a description of a headache.](Jelaskan deskripsi gambar tersebut ke pengguna seolah olah anda melihat gambar!.)"
-      },
-      {
-        "role": "assistant",
-        "content": "Aku tidak bisa \"melihat\" gambar karena saya hanya model bahasa. \n\nKamu bisa coba salin paste teksFOREIGN LANGUAGE dari gambar itu di sini, dan aku bisa coba menerjemahkan dan menjelaskan artinya untukmu.  \n\n"
-      },
-      {
-        "role": "user",
-        "content": "deskripsikan konteks nya\n\n[!img: The image shows a text message displayed on a cell phone screen. The message is written in a foreign language, and it appears to be a conversation between two people. The text message is displayed in a black color, and it seems to be a discussion about a headache. The conversation is taking place in a foreign language, and the text message is displayed in a black color.](Jelaskan deskripsi gambar tersebut ke pengguna seolah olah anda melihat gambar!.)"
-      },
-      {
-        "role": "assistant",
-        "content": "Oke, aku bisa membayangkan skenarionya berdasarkan deskripsi! \n\nBagiku seperti melihat layar ponsel seseorang. Di layar itu ada percakapan teks, warnanya hitam, antara dua orang. Dari deskripsi kamu, kurasa mereka sedang ngobrol tentang sakit kepala. Sayangnya, karena bahasanya asing, aku gak bisa tahu detail percakapannya.\n\nSemoga ini membantumu! 😊 \n\n\n"
-      },
-      {
-        "role": "user",
-        "content": "Judul percakapan nya apa sih\n\n[!img: Sindrom Kepala Meldek Ini Adalah Kondisi Keserangan Sura Keras Kekerasan Serta Seperti Sindrom Head Syndrome](Jelaskan deskripsi gambar tersebut ke pengguna seolah olah anda melihat gambar!.)"
-      },
-      {
-        "role": "assistant",
-        "content": "Wah, judul percakapannya cukup  menarik dan unik! \n\nJudulnya adalah \"Sindrom Kepala Meldek Ini Adalah Kondisi Keserangan Sura Keras Kekerasan Serta Seperti Sindrom Head Syndrome\". \n\nJudul ini sepertinya agak teka-teki dan mengundang rasa penasaran, ya. kayak ada sesuatu yang aneh atau unik tentang \"Sindrom Kepala Meldek\". Mungkin itu istilah baru buat suatu jenis sakit kepala atau bisa juga sekedar judul yang dibuat buat lucu-lucuan.  😉\n\n\n"
-      }
-    ]
-  }
+  
 }
