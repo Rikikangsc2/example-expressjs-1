@@ -119,8 +119,7 @@ if (url) {
   }
 
   // Update history with new user message
-  gambar ? history.push({ role: "assistant", content: `[!image:${gambar}]` }) : ""
-  history.push({ role: "user", content: text });
+  history.push({ role: "user", content: `${text}${gambar ? "\n\n[!img: "+gambar+"](Jelaskan deskripsi gambar tersebut ke pengguna seolah olah anda melihat gambar!.)": ""}` });
 
   // Trim history to keep within token limit
   history = manageTokenCount(history);
