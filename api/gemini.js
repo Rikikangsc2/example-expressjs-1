@@ -77,7 +77,7 @@ const saveModelConfig = (user, config) => {
 // Function to manage token count and history trimming
 const manageTokenCount = (history) => {
   let totalTokens = history.reduce((acc, msg) => acc + msg.content.length, 0);
-  while (totalTokens > 7192 && history.length > 1) {
+  while (totalTokens > 3000 && history.length > 1) {
     history.shift(); // Remove the oldest message until total tokens are under 7192
     totalTokens = history.reduce((acc, msg) => acc + msg.content.length, 0);
   }
