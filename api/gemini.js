@@ -6,9 +6,7 @@ const API_KEY = Math.random() < 0.5 ? "gsk_UiKN5pJMzTyYvJBttLgwWGdyb3FYSrCt8dbL9
 const dbPath = 'db/data.json';
 const modelPath = 'db/model.json';
 const MODEL_NAME = "gemma2-9b-it";
-let gambar = null;
 
-// Configuration for API request
 const generationConfig = {
   temperature: 1,
   max_tokens: 200,
@@ -17,7 +15,6 @@ const generationConfig = {
   stop: null,
 };
 
-// Initialize databases if they don't exist
 const initializeDb = () => {
   if (!fs.existsSync(dbPath)) {
     fs.writeFileSync(dbPath, JSON.stringify({}), 'utf8');
@@ -27,7 +24,6 @@ const initializeDb = () => {
   }
 };
 
-// Load chat history for a user
 const loadHistory = (user) => {
   try {
     initializeDb();
@@ -39,7 +35,6 @@ const loadHistory = (user) => {
   }
 };
 
-// Save chat history for a user
 const saveHistory = (user, history) => {
   try {
     initializeDb();
@@ -51,7 +46,6 @@ const saveHistory = (user, history) => {
   }
 };
 
-// Load model configuration
 const loadModelConfig = (user) => {
   try {
     initializeDb();
@@ -63,7 +57,6 @@ const loadModelConfig = (user) => {
   }
 };
 
-// Save model configuration
 const saveModelConfig = (user, config) => {
   try {
     initializeDb();
@@ -75,11 +68,10 @@ const saveModelConfig = (user, config) => {
   }
 };
 
-// Function to manage token count and history trimming
 const manageTokenCount = (history) => {
   let totalTokens = history.reduce((acc, msg) => acc + msg.content.length, 0);
   while (totalTokens > 3000 && history.length > 1) {
-    history.shift(); // Remove the oldest message until total tokens are under 3000
+    history.shift();
     totalTokens = history.reduce((acc, msg) => acc + msg.content.length, 0);
   }
   return history;
@@ -87,20 +79,20 @@ const manageTokenCount = (history) => {
 
 module.exports = async (req, res) => {
   const { text, user, url } = req.query;
+  let gambar = null;
 
-if (url) {
-  try {
-    const response = await axios.get('https://purapi.koyeb.app/imgtext', {params: {url: url, text: text}});
-    gambar = response.data.trim()
-  } catch (error) {
-    gambar = null
+  if (url) {
+    try {
+      const response = await axios.get('https://purapi.koyeb.app/imgtext', { params: { url: url, text: text } });
+      gambar = response.data.trim();
+    } catch (error) {
+      gambar = null;
+    }
   }
-}
-  
+
   let history = loadHistory(user);
   const modelConfig = loadModelConfig(user);
 
-  // Set system prompt if "setPrompt:" command is issued
   if (text.startsWith("setPrompt:")) {
     const newPrompt = text.replace("setPrompt:", "").trim();
     modelConfig.systemPrompt = newPrompt;
@@ -111,17 +103,18 @@ if (url) {
     return res.json({ result: "System prompt has been set and chat history reset." });
   }
 
-  // Reset history if "reset" command is issued
   if (text === "reset") {
     history = [];
     saveHistory(user, history);
     return res.json({ result: "Chat history has been reset." });
   }
 
-  // Update history with new user message
-  history.push({ role: "user", content: `${text}${gambar ? "\n\n[!img: "+gambar+"](Jelaskan deskripsi gambar ke pengguna, dan jangan di lebih lebihkan atau bahkan di kurangi. Jadi berikan apa adanya saja!.\n\nNote: Jika deskripsi belum jelas dan tidak bisa untuk memenuhi permintaan pengguna silahkan beri respon \"Gambar Kurang jelas!\")": ""}` });
+  const userMessage = gambar 
+    ? `${text}\n\n[!img: ${gambar}](Jelaskan deskripsi gambar ke pengguna, dan jangan di lebih lebihkan atau bahkan di kurangi. Jadi berikan apa adanya saja!.\n\nNote: Jika deskripsi belum jelas dan tidak bisa untuk memenuhi permintaan pengguna silahkan beri respon \"Aku masih belajar, silahkan kirim ulang gambar dan printahkan aku lebih jelas lagi!\")`
+    : text;
 
-  // Trim history to keep within token limit
+  history.push({ role: "user", content: userMessage });
+
   history = manageTokenCount(history);
 
   try {
@@ -141,12 +134,9 @@ if (url) {
     });
 
     const responseText = response.data.choices[0].message.content;
-
-    // Update history with AI response and save it
     history.push({ role: "assistant", content: responseText });
     saveHistory(user, history);
 
-    // Update last token count in model config and save
     modelConfig.lastTokenCount = history.reduce((acc, msg) => acc + msg.content.length, 0);
     saveModelConfig(user, modelConfig);
 
