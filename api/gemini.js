@@ -83,7 +83,7 @@ module.exports = async (req, res) => {
 
   if (url) {
     try {
-      const response = await axios.get('https://purapi.koyeb.app/imgtext', { params: { url: url, text: text } });
+      const response = await axios.get('https://purapi.koyeb.app/imgtext', { params: { url: url, text: text+". Deskripsikan gambarnya secara detail." } });
       gambar = response.data.trim();
     } catch (error) {
       gambar = null;
