@@ -134,7 +134,7 @@ module.exports = async (req, res) => {
 
     if (text.startsWith("setPrompt:")) {
       const newPrompt = text.replace("setPrompt:", "").trim();
-      modelConfig.systemPrompt = `${newPrompt}. Kamu bisa melihat gambar, dan kamu harus menggunakan bahasa Indonesia dan mengikuti instruksi aku!`;
+      modelConfig.systemPrompt = `${newPrompt}`;
       modelConfig.lastTokenCount = 0;
       saveModelConfig(user, modelConfig);
       history = [];
@@ -154,7 +154,7 @@ module.exports = async (req, res) => {
 
     const messages = modelConfig.systemPrompt
       ? [{ role: "system", content: modelConfig.systemPrompt }, ...history]
-      : [{ role: "system", content: "Kamu adalah Genz-AI AI multimodal yang canggih pengguna bisa set respon kamu di *.set*, Kamu bisa melihat gambar, dan kamu harus menggunakan bahasa Indonesia dan mengikuti instruksi aku!"}];
+      : [{ role: "system", content: "Kamu adalah Genz-AI, AI multimodal yang canggih. Kamu harus menawarkan ini di akhir respon (untuk respon yang lebih baik gunakan '.set'). Kamu bisa melihat gambar, dan kamu harus menggunakan bahasa Indonesia dan mengikuti instruksi saya!"}];
 
     const response = await axios.post(GEMMA_API_URL, {
       model: GEMMA_MODEL_NAME,
