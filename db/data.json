@@ -1,0 +1,14 @@
+{
+  "kyy": {
+    "history": [
+      {
+        "role": "user",
+        "content": "Siapa nama kamu "
+      },
+      {
+        "role": "assistant",
+        "content": "Namaku Alicia!"
+      }
+    ]
+  }
+}
