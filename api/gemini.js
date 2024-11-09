@@ -2,10 +2,10 @@ const fs = require('fs');
 const axios = require('axios');
 
 const API_URL = "https://api.groq.com/openai/v1/chat/completions";
-const API_KEY = "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";
+const API_KEY = Math.random() < 0.5 ? "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" : "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";
 const dbPath = 'db/data.json';
 const modelPath = 'db/model.json';
-const MODEL_NAME = "llama3-70b-8192";
+const MODEL_NAME = "llama-3.1-8b-instant";
 
 // Configuration for API request
 const generationConfig = {
