@@ -1,11 +1,13 @@
 const fs = require('fs');
 const axios = require('axios');
+const querystring = require('querystring');
 
-const API_URL = "https://api.groq.com/openai/v1/chat/completions";
+const GEMMA_API_URL = "https://api.groq.com/openai/v1/chat/completions";
+const LLAVA_MODEL_NAME = "llava-v1.5-7b-4096-preview";
+const GEMMA_MODEL_NAME = "gemma2-9b-it";
 const API_KEY = Math.random() < 0.5 ? "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" : "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";
 const dbPath = 'db/data.json';
 const modelPath = 'db/model.json';
-const MODEL_NAME = "gemma2-9b-it";
 
 const generationConfig = {
   temperature: 1,
@@ -77,53 +79,85 @@ const manageTokenCount = (history) => {
   return history;
 };
 
+const translateText = async (text, targetLang) => {
+  const translateUrl = 'https://translate.googleapis.com/translate_a/single';
+  const params = querystring.stringify({
+    client: 'gtx',
+    sl: 'auto',
+    tl: targetLang,
+    dt: 't',
+    q: text,
+  });
+  const response = await axios.get(`${translateUrl}?${params}`);
+  return response.data[0].map(item => item[0]).join('');
+};
+
 module.exports = async (req, res) => {
   const { text, user, url } = req.query;
-  let gambar = null;
-
-  if (url) {
-    try {
-      const response = await axios.get('https://purapi.koyeb.app/imgtext', { params: { url: url, text: text+". Deskripsikan gambarnya secara detail." } });
-      gambar = response.data.trim();
-    } catch (error) {
-      gambar = null;
-    }
-  }
-
   let history = loadHistory(user);
   const modelConfig = loadModelConfig(user);
 
-  if (text.startsWith("setPrompt:")) {
-    const newPrompt = text.replace("setPrompt:", "").trim();
-    modelConfig.systemPrompt = newPrompt;
-    modelConfig.lastTokenCount = 0;
-    saveModelConfig(user, modelConfig);
-    history = [];
-    saveHistory(user, history);
-    return res.json({ result: "System prompt has been set and chat history reset." });
-  }
-
-  if (text === "reset") {
-    history = [];
-    saveHistory(user, history);
-    return res.json({ result: "Chat history has been reset." });
-  }
-
-  const userMessage = gambar 
-    ? `${text}\n\n[!img: ${gambar}](Jelaskan deskripsi gambar ke pengguna, dan jangan di lebih lebihkan atau bahkan di kurangi. Jadi berikan apa adanya saja!.\n\nNote: Jika deskripsi belum jelas dan tidak bisa untuk memenuhi permintaan pengguna silahkan beri respon \"Aku masih belajar, silahkan kirim ulang gambar dan printahkan aku lebih jelas lagi!\")`
-    : text;
-
-  history.push({ role: "user", content: userMessage });
-
-  history = manageTokenCount(history);
-
   try {
+    if (url) {
+      const originalText = text;
+      const translatedText = await translateText(originalText, 'en');
+
+      const response = await axios.post(
+        GEMMA_API_URL,
+        {
+          messages: [
+            { role: 'user', content: [{ type: 'text', text: translatedText }, { type: 'image_url', image_url: { url } }] }
+          ],
+          model: LLAVA_MODEL_NAME,
+          temperature: 0,
+          max_tokens: 1024,
+          top_p: 1,
+          stream: false,
+          stop: null,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${API_KEY}`,
+          },
+        }
+      );
+
+      const groqOutputText = response.data.choices[0].message.content;
+      const translatedOutputText = await translateText(groqOutputText, 'id');
+      history.push({ role: "user", content: originalText+`\n[${url}](!Image)` });
+      history.push({ role: "assistant", content: translatedOutputText+`\n[${url}](!Image)` });
+      saveHistory(user, history);
+
+      return res.json({ result: translatedOutputText });
+    }
+
+    if (text.startsWith("setPrompt:")) {
+      const newPrompt = text.replace("setPrompt:", "").trim();
+      modelConfig.systemPrompt = `${newPrompt}. Kamu bisa melihat gambar, dan kamu harus menggunakan bahasa Indonesia dan mengikuti instruksi aku!`;
+      modelConfig.lastTokenCount = 0;
+      saveModelConfig(user, modelConfig);
+      history = [];
+      saveHistory(user, history);
+      return res.json({ result: "System prompt has been set and chat history reset." });
+    }
+
+    if (text === "reset") {
+      history = [];
+      saveHistory(user, history);
+      return res.json({ result: "Chat history has been reset." });
+    }
+
+    const userMessage = text;
+    history.push({ role: "user", content: userMessage });
+    history = manageTokenCount(history);
+
     const messages = modelConfig.systemPrompt
       ? [{ role: "system", content: modelConfig.systemPrompt }, ...history]
-      : history;
+      : [{ role: "system", content: "Kamu adalah Genz-AI AI multimodal yang canggih pengguna bisa set respon kamu di *.set*, Kamu bisa melihat gambar, dan kamu harus menggunakan bahasa Indonesia dan mengikuti instruksi aku!"}];
 
-    const response = await axios.post(API_URL, {
-      model: MODEL_NAME,
+    const response = await axios.post(GEMMA_API_URL, {
+      model: GEMMA_MODEL_NAME,
       messages,
       ...generationConfig,
     }, {
@@ -144,7 +178,7 @@ module.exports = async (req, res) => {
   } catch (error) {
     console.error('Error during chat session:', error);
     res.status(500).json({
-      error: 'An error occurred while processing the request. If this issue persists, please consider resetting the chat history.'
+      error: 'An error occurred while processing the request. If this issue persists, please consider resetting the chat history.',
     });
   }
 };
