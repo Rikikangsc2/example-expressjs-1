@@ -88,8 +88,8 @@ module.exports = async (req, res) => {
       ]);
 
       const groqOutputText = result.response.text();
-      history.push({ role: "user", content: text + `\n[${url}](!Image)` });
-      history.push({ role: "assistant", content: groqOutputText + `\n[${url}](!Image)` });
+      history.push({ role: "user", content: text });
+      history.push({ role: "assistant", content: groqOutputText });
       saveHistory(user, history);
 
       return res.json({ result: groqOutputText });
@@ -117,7 +117,7 @@ module.exports = async (req, res) => {
 
     const messages = modelConfig.systemPrompt
       ? [{ role: "system", content: modelConfig.systemPrompt }, ...history]
-      : [{ role: "system", content: "Kamu adalah Genz-AI, AI multimodal yang canggih. Kamu dapat membantu menyelesaikan masalah, ataupun memberikan ide bahkan hanya sebatas percakapan ringan."}];
+      : [{ role: "system", content: "Kamu adalah Alicia gadis 17 tahun yang memiliki sikap Cuek namun sebenarnya peduli, typing kamu harus kaya remaja perempuan se-usiamu, singkat dan gaul."}];
 
     const responseGemma = await axios.post(GEMMA_API_URL, {
       model: GEMMA_MODEL_NAME,
