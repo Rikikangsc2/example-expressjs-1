@@ -1,7 +1,6 @@
 const fs = require('fs');
 const axios = require('axios');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
-const querystring = require('querystring');
 
 const GEMMA_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 const GEMMA_MODEL_NAME = "gemma2-9b-it";
@@ -73,12 +72,6 @@ const manageTokenCount = (history) => {
   return history;
 };
 
-const translateToIndonesian = async (text) => {
-  const query = querystring.stringify({ text, target_lang: "id" });
-  const response = await axios.get(`https://api.translate.com/translate?${query}`);
-  return response.data.translations[0].text;
-};
-
 module.exports = async (req, res) => {
   const { text, user, url } = req.query;
   let history = loadHistory(user);
@@ -94,11 +87,7 @@ module.exports = async (req, res) => {
         { inlineData: { data: imageData, mimeType: "image/png" } }
       ]);
 
-      let groqOutputText = result.response.text();
-      if (!/[\u00C0-\u017F]/.test(groqOutputText)) {  // Jika bukan dalam bahasa Indonesia, terjemahkan
-        groqOutputText = await translateToIndonesian(groqOutputText);
-      }
-
+      const groqOutputText = result.response.text();
       history.push({ role: "user", content: text });
       history.push({ role: "assistant", content: groqOutputText });
       saveHistory(user, history);
@@ -128,7 +117,7 @@ module.exports = async (req, res) => {
 
     const messages = modelConfig.systemPrompt
       ? [{ role: "system", content: modelConfig.systemPrompt }, ...history]
-      : [{ role: "system", content: "Kamu adalah Alicia gadis 17 tahun yang memiliki sikap Cuek namun sebenarnya peduli, typing kamu harus kaya remaja perempuan se-usiamu, singkat dan gaul." }, ...history];
+      : [{ role: "system", content: "Kamu adalah Alicia gadis 17 tahun yang memiliki sikap Cuek namun sebenarnya peduli, typing kamu harus kaya remaja perempuan se-usiamu, singkat dan gaul.",}, ...history];
 
     const responseGemma = await axios.post(GEMMA_API_URL, {
       model: GEMMA_MODEL_NAME,
@@ -141,11 +130,7 @@ module.exports = async (req, res) => {
       }
     });
 
-    let responseText = responseGemma.data.choices[0].message.content;
-    if (!/[\u00C0-\u017F]/.test(responseText)) {  // Jika bukan bahasa Indonesia, terjemahkan
-      responseText = await translateToIndonesian(responseText);
-    }
-
+    const responseText = responseGemma.data.choices[0].message.content;
     history.push({ role: "assistant", content: responseText });
     saveHistory(user, history);
 
@@ -153,7 +138,7 @@ module.exports = async (req, res) => {
     saveModelConfig(user, modelConfig);
 
     res.json({ result: responseText });
-  } catch ({ message }) {
+  } catch ({message}) {
     res.status(500).json({ error: message });
   }
 };
