@@ -83,8 +83,8 @@ module.exports = async (req, res) => {
       const imageData = Buffer.from(response.data).toString("base64");
 
       const result = await model.generateContent([
-        text,
-        { inlineData: { data: imageData, mimeType: "image/png" } }
+        `${history.map((item) => `*${item.role === 'assistant' ? 'Gemini' : 'User'}*: ${item.content}`).join('\n')}${"User"+text}\nGemini:`,
+        { inlineData: { data: imageData, mimeType: "image/png" }}
       ]);
 
       const groqOutputText = result.response.text();
