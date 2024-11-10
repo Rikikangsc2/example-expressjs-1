@@ -3,7 +3,7 @@ const axios = require('axios');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const GEMMA_API_URL = "https://api.groq.com/openai/v1/chat/completions";
-const GEMMA_MODEL_NAME = "gemma2-9b-it";
+const GEMMA_MODEL_NAME = "llama3-70b-8192";
 const API_KEY = Math.random() < 0.5 ? "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" : "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";
 const GEMINI_API_KEY = "AIzaSyCtBDTdbx37uvBqiImuFdZFfAf5RD5igVY";
 const dbPath = 'db/data.json';
@@ -11,7 +11,7 @@ const modelPath = 'db/model.json';
 
 const generationConfig = {
   temperature: 1,
-  max_tokens: 200,
+  max_tokens: 150,
   top_p: 1,
   stream: false,
   stop: null,
