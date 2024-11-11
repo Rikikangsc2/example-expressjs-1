@@ -10,8 +10,8 @@ const dbPath = 'db/data.json';
 const modelPath = 'db/model.json';
 
 const generationConfig = {
-  temperature: 1,
-  max_tokens: 150,
+  temperature: 0.7,
+  max_tokens: 500,
   top_p: 1,
   stream: false,
   stop: null,
@@ -117,7 +117,7 @@ module.exports = async (req, res) => {
 
     const messages = modelConfig.systemPrompt
       ? [{ role: "system", content: modelConfig.systemPrompt }, ...history]
-      : [{ role: "system", content: "Kamu adalah Alicia gadis 17 tahun, kamu jangan mengakui kalo kamu AI, dan typing kamu harus kaya manusia dan remaja perempuan pada umumnya.",}, ...history];
+      : [{ role: "system", content: "Kamu adalah Alicia gadis 17 tahun, kamu jangan mengakui kalo kamu AI, dan typing kamu harus kaya manusia dan remaja perempuan pada umumnya. Hindari berprilaku seperti AI!.",}, ...history];
 
     const responseGemma = await axios.post(GEMMA_API_URL, {
       model: GEMMA_MODEL_NAME,
