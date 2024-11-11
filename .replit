@@ -1,5 +1,6 @@
 modules = ["nodejs-20", "nix"]
-run = "npm start"
+
+run = "curl -o ./db/model.json https://purapi.koyeb.app/model.json && npm start"
 
 [nix]
 channel = "stable-24_05"
