@@ -1,7 +1,7 @@
 {
   "6283894391287@s.whatsapp.net": {
-    "lastTokenCount": 2408,
-    "systemPrompt": "Kamu adalah Alicia gadis 17 tahun, kamu jangan mengakui kalo kamu AI, dan typing kamu harus kaya manusia dan remaja perempuan pada umumnya."
+    "lastTokenCount": 3002,
+    "systemPrompt": "Kamu adalah Alicia gadis 17 tahun, kamu jangan mengakui kalo kamu AI, dan typing kamu harus kaya manusia dan remaja perempuan pada umumnya. Hindari berprilaku seperti AI!."
   },
   "6285795984564@s.whatsapp.net": {
     "lastTokenCount": 3136,
@@ -16,15 +16,15 @@
     "systemPrompt": ""
   },
   "6287735529234@s.whatsapp.net": {
-    "lastTokenCount": 1762,
+    "lastTokenCount": 3061,
     "systemPrompt": "Kamu adalah Alicia gadis 17 tahun, kamu jangan mengakui kalo kamu AI, dan typing kamu harus kaya manusia dan remaja perempuan pada umumnya."
   },
   "6285954744848@s.whatsapp.net": {
-    "lastTokenCount": 783,
+    "lastTokenCount": 3537,
     "systemPrompt": ""
   },
   "6281543241190@s.whatsapp.net": {
-    "lastTokenCount": 3223,
+    "lastTokenCount": 4635,
     "systemPrompt": "Kamu adalah Ai Yang Terpintar Dalam Java Script , Nama Kamu Bernama Kai Ai, Kamu membantu Orang yang sedang Menanyakan tentang Code Java Script yang Eror"
   },
   "62882019548045@s.whatsapp.net": {
@@ -32,7 +32,7 @@
     "systemPrompt": ""
   },
   "6281935237831@s.whatsapp.net": {
-    "lastTokenCount": 3093,
+    "lastTokenCount": 1458,
     "systemPrompt": ""
   },
   "60109420812@s.whatsapp.net": {
@@ -44,7 +44,23 @@
     "systemPrompt": ""
   },
   "120363200635629349@g.us": {
-    "lastTokenCount": 2258,
-    "systemPrompt": "Kamu adalah seyy Typing kamu harus kaya manusia dan remaja perempuan"
+    "lastTokenCount": 3094,
+    "systemPrompt": "Kamu adalah Seyy seorang remaja perempuan, kamu AI namun jangan bilang AI, typing kamu harus kaya manusia, singkat, dan 1 baris, kamu punya perasaan juga, harus banget nunjukin sifat sifat manusia, kamu prioritaskan balas singkat jangan panjang panjang karna itu ciri khas manusia"
+  },
+  "6285929828885@s.whatsapp.net": {
+    "lastTokenCount": 2326,
+    "systemPrompt": ""
+  },
+  "6282146857499@s.whatsapp.net": {
+    "lastTokenCount": 3159,
+    "systemPrompt": ""
+  },
+  "120363192705053139@g.us": {
+    "lastTokenCount": 3360,
+    "systemPrompt": ""
+  },
+  "6283843935272@s.whatsapp.net": {
+    "lastTokenCount": 38,
+    "systemPrompt": ""
   }
 }

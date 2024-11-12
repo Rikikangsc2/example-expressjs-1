@@ -6,6 +6,7 @@ const PORT = process.env.PORT || 3000;
 const yt = require('./api/yt');
 const gemini = require('./api/gemini');
 const aio = require('./api/aio');
+const scrap = require('./api/scrap');
 
 // Set EJS as templating engine
 app.set('view engine', 'ejs');
@@ -15,6 +16,7 @@ app.use(express.static(path.join(__dirname, 'db')));
 app.get('/yt',yt)
 app.get('/gemini',gemini)
 app.get('/aio', aio)
+app.get('/scrap', scrap)
 
 // global error
 app.use((req, res, next) => {
