@@ -1,60 +1,56 @@
 const axios = require('axios');
-const cheerio = require('cheerio'); // Add cheerio for HTML parsing
+const cheerio = require('cheerio');
+const API_KEY = Math.random() < 0.5 ? "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" : "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";
 
 module.exports = async (req, res) => {
   const url = req.query.url;
 
   try {
-    // Fetch the HTML content from the specified URL
     const response = await axios.get(url, { responseType: 'text' });
     const contentType = response.headers['content-type'];
 
-    // Check if the content type is either HTML or JSON
     if (contentType.includes('text/html') || contentType.includes('application/json')) {
       const data = response.data;
-
-      // Use Cheerio to load and filter the HTML
       const $ = cheerio.load(data);
-
-      // Remove unwanted elements like <script>, <style>, etc.
       $('script, style, header, footer, nav').remove();
-
-      // Extract and consolidate the text content
       const textContent = $('body').text().replace(/\s+/g, ' ').trim();
 
-      // Send the cleaned text to the generative model API
-      const result = await axios.post(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyCtBDTdbx37uvBqiImuFdZFfAf5RD5igVY`, {
-        contents: [
+      const result = await axios.post('https://api.groq.com/openai/v1/chat/completions', {
+        messages: [
+          {
+            role: "system",
+            content: `Anda adalah pembuat JSON tugas anda adalah membuat JSON dari teks untuk mengambil isinya\n\nJSON yang anda buat harus seperti:
+
+{
+ "judul", //judul
+ "konten", //konten penuh
+ "ringkasan" //ringkas konten
+}
+
+Catatan: 
+- langsung kirim format JSON tanpa tambahan teks apapun sebelum dan sesudah membuat JSON
+- format JSON harus valid dan harus di encode
+- jangan kirim text selain JSON`
+          },
           {
             role: "user",
-            parts: [
-              {
-                text: textContent
-              }
-            ]
+            content: textContent
           }
         ],
-        systemInstruction: {
-          role: "user",
-          parts: [
-            {
-              text: "Anda adalah pembuat JSON tugas anda adalah membuat JSON dari teks untuk mengambil isinya\n\nJSON yang anda buat harus seperti ini:\n{\n\"title\":,\n\"ringkasan\":\n}\n\nCatatan: langsung kirim format JSON tanpa tambahan teks apapun sebelum dan sesudah membuat JSON"
-            }
-          ]
-        },
-        generationConfig: {
-          temperature: 1,
-          topK: 40,
-          topP: 0.95,
-          maxOutputTokens: 8192,
-          responseMimeType: "text/plain"
-        }
+        model: "llama3-8b-8192",
+        temperature: 0,
+        max_tokens: 1024,
+        top_p: 1,
+        stream: false,
+        stop: null
       }, {
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${API_KEY}` // Assuming you store the key in an environment variable
+        }
       });
-
-      // Parse and return the AI-generated JSON response
-      res.json(JSON.parse(result.data.candidates[0].content.parts[0].text));
+     const jsonObject = JSON.parse(result.data.choices[0].message.content.match(/{.*}/s)[0]); 
+      res.json(jsonObject); 
     } else {
       res.status(400).send('Invalid content type for processing');
     }
