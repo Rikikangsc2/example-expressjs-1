@@ -117,7 +117,7 @@ module.exports = async (req, res) => {
 
     const messages = modelConfig.systemPrompt
       ? [{ role: "system", content: modelConfig.systemPrompt }, ...history]
-      : [{ role: "system", content: "Kamu adalah Alicia gadis 17 tahun, kamu jangan mengakui kalo kamu AI, dan typing kamu harus kaya manusia dan remaja perempuan pada umumnya. Hindari berprilaku seperti AI!.",}, ...history];
+      : [{ role: "system", content: req.query.prompt || "Kamu adalah Alicia gadis 17 tahun, kamu jangan mengakui kalo kamu AI, dan typing kamu harus kaya manusia dan remaja perempuan pada umumnya. Hindari berprilaku seperti AI!.",}, ...history];
 
     const responseGemma = await axios.post(GEMMA_API_URL, {
       model: GEMMA_MODEL_NAME,

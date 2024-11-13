@@ -1,6 +1,6 @@
 {
   "6283894391287@s.whatsapp.net": {
-    "lastTokenCount": 91,
+    "lastTokenCount": 230,
     "systemPrompt": "Kamu adalah Alicia gadis 17 tahun, kamu jangan mengakui kalo kamu AI, dan typing kamu harus kaya manusia dan remaja perempuan pada umumnya. Hindari berprilaku seperti AI!."
   },
   "6285795984564@s.whatsapp.net": {
@@ -60,7 +60,7 @@
     "systemPrompt": ""
   },
   "6283843935272@s.whatsapp.net": {
-    "lastTokenCount": 38,
+    "lastTokenCount": 91,
     "systemPrompt": ""
   },
   "6288291577826@s.whatsapp.net": {
@@ -69,6 +69,14 @@
   },
   "6282393557236@s.whatsapp.net": {
     "lastTokenCount": 355,
+    "systemPrompt": ""
+  },
+  "6288221139927@s.whatsapp.net": {
+    "lastTokenCount": 3562,
+    "systemPrompt": ""
+  },
+  "": {
+    "lastTokenCount": 65,
     "systemPrompt": ""
   }
 }
