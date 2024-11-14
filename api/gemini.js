@@ -83,16 +83,18 @@ module.exports = async (req, res) => {
       const imageData = Buffer.from(response.data).toString("base64");
 
       const result = await model.generateContent([
-        `${history.map((item) => `*${item.role === 'assistant' ? 'Gemini' : 'User'}*: ${item.content}`).join('\n')}${"User"+text}\nGemini:`,
-        { inlineData: { data: imageData, mimeType: "image/png" }}
-      ]);
+  `${history.map((item) => `*${item.role === 'assistant' ? 'Gemini' : 'User'}*: ${item.content}`).join('\n')}${"User"+text}\nGemini:`,
+  { inlineData: { data: imageData, mimeType: "image/png" }}
+]);
 
-      const groqOutputText = result.response.text();
+const groqOutputText = result.response.text();
+const cleanedOutputText = groqOutputText.split(/user|gemini/i)[0];
+
       history.push({ role: "user", content: text });
-      history.push({ role: "assistant", content: groqOutputText });
+      history.push({ role: "assistant", content: cleanedOutputText });
       saveHistory(user, history);
 
-      return res.json({ result: groqOutputText });
+      return res.json({ result: cleanedOutputText });
     }
 
     if (text.startsWith("setPrompt:")) {
